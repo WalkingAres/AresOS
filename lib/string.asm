@@ -3,6 +3,7 @@
 global memcpy
 global printf
 global put_char
+global memset
 
 %include "string.inc"
 

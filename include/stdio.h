@@ -3,4 +3,9 @@
 
 void printf(char *s);
 
+void put_char(char ch);
+
+char get_char();
+
+
 #endif

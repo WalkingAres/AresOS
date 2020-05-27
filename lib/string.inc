@@ -47,6 +47,34 @@ memcpy:
 	ret			; 函数结束，返回
 ; memcpy 结束-------------------------------------------------------------
 
+;============== void* memset(void * dst, void value, uint_32 n) 
+memset:
+       push ebp
+       mov ebp, esp
+
+       push edi
+       push eax
+
+       mov edi, [ebp+8]
+       mov eax, [ebp+12]
+       mov ecx, [ebp+16]
+
+.1
+       mov [es:edi], al
+       inc edi
+       loop .1
+
+       mov eax, [ebp+8]
+
+       pop eax
+       pop edi
+
+       pop ebp
+
+       ret
+
+
+
 ; void put_string(char *s);
 ; void put_char(char ch);
 ;

@@ -2,6 +2,8 @@
 #define PM_H
 
 #include "def.h"
+#include "int.h"
+
 //保存GDT IDT相关的数据结构
 
 #define	GDT_SIZE	128
@@ -36,13 +38,39 @@ DESCRIPTOR	gdt[GDT_SIZE];
 uint8_t		idt_ptr[6];	/* 0~15:Limit  16~47:Base */
 GATE		idt[IDT_SIZE];
 
-void init_dspt(DESCRIPTOR * dspt,uint32_t base, uint32_t limit, uint16_t attr) {
-    dspt->limit_low = limit & 0x0ffff;
-    dspt->base_low = base & 0x0ffff;
-    dspt->base_mid = (base >> 16) & 0x0ff;
-    dspt->attr1 = attr & 0x0ff;
-    dspt->limit_high_attr2 = ((limit >> 16) & 0x0f) | (((attr >> 8) & 0x0f) << 4);
-    dspt->base_high = (base >> 24) & 0x0ff;
-}
+#define SEG_32	0x4000	//32 位段
+#define SEG_LIMIT_4K	0x8000   //段界限粒度为 4K 字节
+
+#define SEG_DPL0		0x00	//DPL = 0
+#define SEG_DPL1    	0x20	//DPL = 1
+#define SEG_DPL2   	    0x40	//DPL = 2
+#define SEG_DPL3		0x60	 //DPL = 3
+
+#define SEG_DR		    0x90	//存在的只读数据段类型值
+#define SEG_DRW			0x92	//存在的可读写数据段属性值
+#define SEG_DRWA		0x93	//存在的已访问可读写数据段类型值
+#define SEG_C			0x98	//存在的只执行代码段属性值
+#define SEG_CR			0x9A	//存在的可执行可读代码段属性值
+#define SEG_CCO			0x9C	//存在的只执行一致代码段属性值
+#define SEG_CCOR		0x9E	//存在的可执行可读一致代码段属性值
+
+#define SEG_LDT	        0x82	//局部描述符表段类型值
+#define SEG_TaskGate    0x85	//任务门类型值
+#define SEG_386TSS		0x89    //386 任务状态段类型值
+#define SEG_CGate       0x8C	//调用门类型值
+#define SEG_IGate		0x8E	//中断门类型值
+#define SEG_TGate		0x8F	//陷阱门类型值
+
+
+//GDT 选择子
+
+#define SelectorCode 8
+#define SelectorData 16
+#define SelectorVideo 24
+
+void init_gdt_dspt(DESCRIPTOR * dspt,uint32_t base, uint32_t limit, uint16_t attr);
+
+void init_idt_dspt(GATE * dspt, int_handler addr, uint16_t selector, uint8_t attr, uint8_t dcount);
+
 
 #endif
