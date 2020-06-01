@@ -6,16 +6,14 @@
 
 typedef struct Keyboard
 {
-    char* p_head;       //scan code ¿ÕÏĞ»º³åÎ»ÖÃ
-    char* p_tail;       //´ı½âÎö scan code Ê×Î»ÖÃ
-    char* p_read;
-    char* p_input;
+    int head;
+    int tail;
+    int rpos;
+    int wpos;
     int count;
     int readcount;
     char code_buf[KB_BUF_SIZE];
     char input_buf[KB_BUF_SIZE];
-
-
 }Keyboard;
 
 Keyboard kb;

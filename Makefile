@@ -5,11 +5,13 @@ INCLUDE = -I include/
 KernLib = -I kernel/ -I kernel/lib/ -I kernel/interrupt
 
 CFLAGS 	= -m32 -march=i386 -mpreferred-stack-boundary=2 -ffreestanding -fno-builtin -c
+#CFLAGS 	= -m32 -fno-builtin -c
 LDFLAGS =  -m elf_i386 -Ttext 0x30400 -s
+#LDFLAGS =   -Ttext 0x30400 -s
 KernInc = -I $(INCLUDE) kernel/
 
 kernobj = run/kernel1.o run/kernel2.o run/init.o  run/string.o run/kernlib.o run/int.o run/pm.o run/video.o \
-		run/clock.o run/keyboard.o run/global.o
+		run/clock.o run/keyboard.o run/global.o run/time.o
 kerntarget = run/kernel.bin
 OUT = -o $@ $<
 
@@ -41,6 +43,8 @@ run/clock.o : kernel/interrupt/clock.c
 run/keyboard.o : kernel/interrupt/keyboard.c
 	$(CC) $(CFLAGS) $(INCLUDE) $(KernLib) $(OUT)
 run/global.o : kernel/global.c
+	$(CC) $(CFLAGS) $(INCLUDE) $(KernLib) $(OUT)
+run/time.o : kernel/interrupt/time.c
 	$(CC) $(CFLAGS) $(INCLUDE) $(KernLib) $(OUT)
 
 copy : run/kernel.bin

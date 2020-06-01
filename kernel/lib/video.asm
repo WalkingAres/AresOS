@@ -7,7 +7,7 @@ show:
 
     mov al, [ebp+8]
     mov ah, 0x07
-    mov [gs:160*12+80],ax
+    mov [gs:160*24+158],ax
 
     pop eax
 

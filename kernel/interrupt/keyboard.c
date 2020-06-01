@@ -9,25 +9,32 @@
 
 
 
-static int col_flag = 0;
-static int shift_l = 0;
-static int shift_r = 0;
+static int col_flag     = 0;
+static int shift_l      = 0;
+static int shift_r      = 0;
+static int caps_lock    = 0;
+static int ctrl_flag    = 0;
 
 void keyboard_handler() {
+
+    __asm__("pusha\r\n");
+    __asm__("pushf\r\n");
 
     uint8_t scan_code = in_byte(KB_READ_PORT);
     
     //printf("!");
 
     if(kb.count < KB_BUF_SIZE) {
-        *(kb.p_head) = scan_code;
-        kb.p_head++;
-        if(kb.p_head == kb.code_buf + KB_BUF_SIZE) kb.p_head = kb.code_buf;
+        kb.code_buf[kb.head++] = scan_code;
+
+        if(kb.head == KB_BUF_SIZE ) kb.head = 0;
+
         kb.count++;
 
     }
 
-
+    __asm__("popf\r\n");
+    __asm__("popa\r\n");
 
     out_byte(M_CTL,0x20);
     __asm__("leave\r\n");
@@ -36,11 +43,9 @@ void keyboard_handler() {
 
 void init_keyboard() {
 
+    kb.head = kb.tail = kb.rpos = kb.wpos = 0;
     kb.count = 0;
     kb.readcount = 0;
-    kb.p_head = kb.p_tail = kb.code_buf;
-    kb.p_read = kb.p_input = kb.input_buf;
-
     set_intGate(KEYBOARD_VECTOR,keyboard_handler);
     //enble_irq(KEYBOARD_IRQ);
 }
@@ -49,20 +54,18 @@ static int col_flag;
 
 void keyboard_read() {
 
-    __asm__("cli\r\n");
-
     uint8_t scan_code;
     int make;
     uint8_t key;
     uint8_t * map_row;
 
     if(kb.count > 0) {
-        //printf("@");
-                //put_char(kb.count+'0');
-        scan_code = *(kb.p_tail);
-        kb.p_tail++;
-        if(kb.p_tail == kb.code_buf + KB_BUF_SIZE) kb.p_tail = kb.code_buf;
+        disable_irq(KEYBOARD_IRQ);
+        //put_char(kb.count+'0');
+        scan_code = kb.code_buf[kb.tail++];
+        if(kb.tail == KB_BUF_SIZE) kb.tail = 0;
         kb.count = kb.count - 1;
+        enble_irq(KEYBOARD_IRQ);
 
         switch (scan_code)
         {
@@ -76,10 +79,10 @@ void keyboard_read() {
                 make = (scan_code&0x80)? 0:1;
                 map_row = &keymap[(scan_code&0x7f)*MAP_COL];
                 col_flag = 0;
-                if(shift_l == 1 || shift_r == 1) {
+                if(shift_l == 1 || shift_r == 1 || caps_lock == 1) {
                     col_flag = 1;
                 }
-
+            
                 key = map_row[col_flag];
                 switch (key)
                 {
@@ -91,6 +94,14 @@ void keyboard_read() {
                     shift_r = make;
                     key = 0;
                     break;
+                case CAPS_LOCK:
+                    caps_lock = make;
+                    key = 0;
+                    break;
+                case ENTER:
+                    //put_char('@');
+                    ctrl_flag = make;
+                    break;
                 default:
                     if(!make) key = 0;
                     break;
@@ -100,18 +111,11 @@ void keyboard_read() {
         }
 
         if(key != 0) {
-            *(kb.p_input) = key;
-            kb.p_input++;
+            if(!ctrl_flag) put_char(key);
+            kb.input_buf[kb.wpos++] = key; 
+            if(kb.wpos == KB_BUF_SIZE) kb.wpos = 0;
             kb.readcount++;
-            if(kb.p_input == kb.input_buf + KB_BUF_SIZE) 
-                kb.p_input = kb.input_buf;
-            //put_char(key);
         }
-        
-        //put_char(kb.readcount+'0');
 
     }
-
-    __asm__("sti\r\n");
-
 }

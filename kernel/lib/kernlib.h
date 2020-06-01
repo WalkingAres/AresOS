@@ -9,6 +9,10 @@ void LGDT(void * gdt_ptr);
 void LIDT(void * idt_ptr);
 void CLI();
 void STI();
+void POP_AD();
+void PUSH_AD();
+void savereg();
+void retreg();
 
 void show(char ch);
 

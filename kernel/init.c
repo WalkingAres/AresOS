@@ -7,6 +7,8 @@
 #include "int.h"
 #include "clock.h"
 #include "keyboard.h"
+#include "time.h"
+
 
 void init_gdt() {
     memcpy( gdt,
@@ -45,7 +47,7 @@ void init_idt() {
     int i;
     for(i=0;i<256;i++) set_intGate(i,0x0);
 
-    // 8253
+    // 8253 Ê±ÖÓ clock
     out_byte(0x43,0x34);
     out_byte(0x40,(uint8_t)119182/100);
     out_byte(0x40,(uint8_t)(119182/100 >> 8));
@@ -59,6 +61,8 @@ void init() {
     init_clock();
     //enble_irq(0x0);
     init_keyboard();
+
+    init_time();
 
     //disable_irq(KEYBOARD_IRQ);
 

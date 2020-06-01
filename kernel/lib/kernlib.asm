@@ -5,6 +5,9 @@ global LGDT
 global LIDT
 global CLI
 global STI
+global savereg
+global retreg
+
 
 ;========= void out_byte(uint16_t port, uint8_t value)
 
@@ -64,3 +67,18 @@ STI:
     sti
 
     ret
+
+
+savereg:
+
+    pusha
+    pushfd
+
+    ret
+
+retreg:
+    popfd
+    popa
+
+    ret
+    

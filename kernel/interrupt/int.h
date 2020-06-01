@@ -10,11 +10,16 @@
 #define S_CTL 0xa0
 #define S_CTLMASK 0xa1
 
-#define TIME_IRQ 0
+#define CLOCK_IRQ 0
 #define KEYBOARD_IRQ 1
+#define TIME_IRQ 8
 
-#define TIME_VECTOR 0x20
+#define CLOCK_VECTOR 0x20
 #define KEYBOARD_VECTOR 0x21
+#define TIME_VECTOR 0x28
+
+
+
 
 void enble_irq(uint8_t irq);
 

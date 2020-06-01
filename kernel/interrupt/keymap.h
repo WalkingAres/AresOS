@@ -3,18 +3,29 @@
 
 #include "def.h"
 
-enum KEY_CTL
-{
-    BACKSPACE = 0x81,
-    TAB,
-    ENTER,
-    PAD_ENTER,
-    CTRL_L,
-    SHIFT_L,
-    PAD_SLASH,
-    SHIFT_R,
-    CAPS_LOCK
-};
+#define EXT 0x3a
+
+
+// enum KEY_CTL
+// {
+//     BACKSPACE = 0x81,
+//     TAB,
+//     ENTER,
+//     PAD_ENTER,
+//     CTRL_L,
+//     SHIFT_L,
+//     PAD_SLASH,
+//     SHIFT_R,
+//     CAPS_LOCK
+// };
+
+#define ENTER       0x0d
+#define BACKSPACE   0x08 
+#define TAB         0x09
+#define CTRL_L      0x80 + EXT
+#define SHIFT_L     0x81 + EXT
+#define SHIFT_R     0x82 + EXT
+#define CAPS_LOCK   0x83 + EXT
 
 #define MAP_COL 3
 
@@ -49,7 +60,7 @@ uint8_t keymap[]= {
     'p',    'P',    0,
     '[',    '{',    0,
     ']',    '}',    0,
-    ENTER,  ENTER,  PAD_ENTER,      //0x1c
+    ENTER,  ENTER,  0,              //0x1c
     CTRL_L, CTRL_L, CTRL_L,         //0x1d
     'a',    'A',    0,
     's',    'S',    0,
@@ -74,7 +85,7 @@ uint8_t keymap[]= {
     'm',    'M',    0,
     ',',    '<',    0,
     '.',    '>',    0,
-    '/',    '?',    PAD_SLASH,
+    '/',    '?',    0,
     SHIFT_R, SHIFT_R, 0,            //0x36
     '*',    '*',    0,
     0,      0,      0,
