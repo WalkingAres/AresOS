@@ -18,3 +18,8 @@ void init_idt_dspt(GATE * dspt, int_handler addr, uint16_t selector, uint8_t att
     dspt->attr = attr;
     dspt->offset_high = (offset >> 16) & 0x0ffff;
 }
+
+uint32_t seg_to_phyaddr(uint16_t seg) {
+    DESCRIPTOR *p = &(gdt[seg>>3]);
+    return (p->base_high<<24 | p->base_mid << 16 | p->limit_low );
+}

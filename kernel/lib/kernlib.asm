@@ -7,6 +7,9 @@ global CLI
 global STI
 global savereg
 global retreg
+global in_word
+global pro
+
 
 
 ;========= void out_byte(uint16_t port, uint8_t value)
@@ -82,3 +85,24 @@ retreg:
 
     ret
     
+in_word:
+    push edx
+
+    mov edx, [esp+8]
+    xor eax, eax
+    mov eax, 0x03
+    in ax, dx
+    nop
+    nop
+
+    pop edx
+
+    ret
+
+
+pro:
+
+    call 0x40400
+
+    ret
+

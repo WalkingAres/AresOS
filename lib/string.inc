@@ -53,7 +53,7 @@ memset:
        mov ebp, esp
 
        push edi
-       push eax
+
 
        mov edi, [ebp+8]
        mov eax, [ebp+12]
@@ -66,7 +66,7 @@ memset:
 
        mov eax, [ebp+8]
 
-       pop eax
+
        pop edi
 
        pop ebp

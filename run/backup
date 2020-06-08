@@ -1,0 +1,44 @@
+############################################################################################
+#    Configuration file Bochs
+############################################################################################
+
+#    How much memory the emulated will have
+
+#    指定内存大小
+megs: 32
+
+#    filename of ROM images
+
+#    ROM镜像，使用时检查一下该目录下有没有对应文件
+romimage: file=/usr/local/share/bochs/BIOS-bochs-latest
+vgaromimage: file=/usr/local/share/bochs/VGABIOS-lgpl-latest
+
+#    What disk images will be used
+
+#    指定A盘软盘
+
+#floppya: 1_44=run/a.img, status=inserted
+#floppyb: 1_44=pm.img,status=inserted
+#    Choose the boot disk
+
+ata0: enabled=1,ioaddr1=0x1f0, ioaddr2=0x3f0,irq=14
+ata0-master: type=disk, translation=auto, path="diskb.img", cylinders=20, heads=16, spt=63, biosdetect=auto, model="Generic 1234", mode=flat
+
+#    选择一个启动盘
+boot: disk
+#    Where do we send log messages?
+
+#    日志发送位置
+log: bochsout.log
+
+#    disable the mouse
+
+#    禁用鼠标
+mouse: enabled=0
+
+#    Enable key mapping, using US layout as default.
+
+#    设置键盘
+#keyboard: keymap=/usr/local/share/bochs/keymaps/x11-pc-us.map
+
+#gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0

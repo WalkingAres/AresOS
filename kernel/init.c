@@ -8,6 +8,7 @@
 #include "clock.h"
 #include "keyboard.h"
 #include "time.h"
+#include "proc.h"
 
 
 void init_gdt() {
@@ -16,10 +17,22 @@ void init_gdt() {
             (*(uint16_t *)&gdt_ptr[0]) + 1);
 
     printf("gdt is loaded!\r\n");
-    uint32_t *p = &gdt_ptr[2];
+    uint32_t *p = (uint32_t *) &gdt_ptr[2];
     *p = &gdt;
+    uint16_t *limit = (uint16_t *) gdt_ptr;
     //LGDT((void *)gdt_ptr);
-    return;
+    
+    init_gdt_dspt(&(gdt[SelectorLDT >> 3]), &(proc_table[0].ldts), \
+                    LDT_SIZE*sizeof(DESCRIPTOR)-1,SEG_LDT);
+
+
+    memset(&tss,0,sizeof(tss));
+    tss.ss0 = SelectorData;
+    init_gdt_dspt(&(gdt[SelectorTSS>>3]), (uint32_t)(&tss), \
+                    sizeof(tss)-1,SEG_386TSS);
+    tss.iobase = sizeof(tss);
+
+    *limit = 47;
 }
 
 void init_8259A() {
@@ -47,10 +60,19 @@ void init_idt() {
     int i;
     for(i=0;i<256;i++) set_intGate(i,0x0);
 
-    // 8253 Ê±ÖÓ clock
-    out_byte(0x43,0x34);
-    out_byte(0x40,(uint8_t)119182/100);
-    out_byte(0x40,(uint8_t)(119182/100 >> 8));
+}
+
+void taskA() {
+    int i=0;
+    int j;
+    printf("taskA is running!\r\n");
+    while(1) {
+        //printf("A:");
+        //put_char('0'+i);
+        // i++;
+        // if(i==10) i=0;
+    }
+    //printf("taskA!");
 }
 
 void init() {
@@ -65,6 +87,22 @@ void init() {
     init_time();
 
     //disable_irq(KEYBOARD_IRQ);
+    p_proc = proc_table;
+    p_proc->ldt_sel = SelectorLDT;
+    memcpy(&(p_proc->ldts[0]),&(gdt[SelectorCode>>3]),sizeof(DESCRIPTOR));
+    p_proc->ldts[0].attr1 = SEG_C |  PL_TASK << 5;
+    memcpy(&(p_proc->ldts[1]),&(gdt[SelectorData>>3]),sizeof(DESCRIPTOR));
+    p_proc->ldts[1].attr1 = SEG_DRW |  PL_TASK << 5;
+
+    p_proc->regs.cs = (0 & 0xfff8) | LDT_TI | PL_TASK;
+    p_proc->regs.ds = (8 & 0xfff8) | LDT_TI | PL_TASK;
+    p_proc->regs.es = (8 & 0xfff8) | LDT_TI | PL_TASK;
+    p_proc->regs.fs = (8 & 0xfff8) | LDT_TI | PL_TASK;
+    p_proc->regs.ss = (8 & 0xfff8) | LDT_TI | PL_TASK; 
+    p_proc->regs.gs = (SelectorVideo+3 & 0xfffd) | PL_TASK;
+    p_proc->regs.eip = (uint32_t) taskA;
+    p_proc->regs.esp = (uint32_t) Task_Stack+TASK_STACK_SIZE;
+    p_proc->regs.eflags = 0x1202;
 
     return;   
 }

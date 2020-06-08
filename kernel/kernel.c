@@ -3,18 +3,14 @@
 #include "kernlib.h"
 #include "string.h"
 #include "time.h"
+#include "hd.h"
+#include "proc.h"
 
 void kernel(){
-    char s[] = "hello, AresOS!\n\r";
-    printf(s);
-    printf("hello world\n\r");
-    
 
-    while (1)
-    {
-        /* code */
-    }
-    
-    
-    return;
+    printf("hello world!\r\n");
+    p_proc_ready = proc_table;
+    //get_char();
+
+    restart();
 }

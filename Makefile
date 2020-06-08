@@ -2,7 +2,7 @@ CC = x86_64-elf-gcc
 LD = x86_64-elf-ld
 
 INCLUDE = -I include/
-KernLib = -I kernel/ -I kernel/lib/ -I kernel/interrupt
+KernLib = -I kernel/ -I kernel/lib/ -I kernel/interrupt -I kernel/drive
 
 CFLAGS 	= -m32 -march=i386 -mpreferred-stack-boundary=2 -ffreestanding -fno-builtin -c
 #CFLAGS 	= -m32 -fno-builtin -c
@@ -10,8 +10,9 @@ LDFLAGS =  -m elf_i386 -Ttext 0x30400 -s
 #LDFLAGS =   -Ttext 0x30400 -s
 KernInc = -I $(INCLUDE) kernel/
 
-kernobj = run/kernel1.o run/kernel2.o run/init.o  run/string.o run/kernlib.o run/int.o run/pm.o run/video.o \
-		run/clock.o run/keyboard.o run/global.o run/time.o
+kernobj = run/kernel1.o run/kernel2.o run/init.o  run/string.o run/kernlib1.o run/kernlib2.o \
+		run/int.o run/pm.o run/video.o \
+		run/clock.o run/keyboard.o run/global.o run/time.o run/hd.o
 kerntarget = run/kernel.bin
 OUT = -o $@ $<
 
@@ -28,8 +29,10 @@ run/kernel1.o : kernel/kernel.asm
 	nasm -f elf $(OUT)
 run/init.o : kernel/init.c
 	$(CC) $(CFLAGS) $(INCLUDE) $(KernLib) $(OUT)
-run/kernlib.o : kernel/lib/kernlib.asm
+run/kernlib1.o : kernel/lib/kernlib.asm
 	nasm -f elf $(OUT)
+run/kernlib2.o : kernel/lib/kernlib.c
+	$(CC) $(CFLAGS) $(INCLUDE) $(KernLib) $(OUT)
 run/int.o : kernel/interrupt/int.c
 	$(CC) $(CFLAGS) $(INCLUDE) $(KernLib) $(OUT)
 run/pm.o : kernel/pm.c
@@ -46,10 +49,16 @@ run/global.o : kernel/global.c
 	$(CC) $(CFLAGS) $(INCLUDE) $(KernLib) $(OUT)
 run/time.o : kernel/interrupt/time.c
 	$(CC) $(CFLAGS) $(INCLUDE) $(KernLib) $(OUT)
+run/hd.o : kernel/drive/hd.c
+	$(CC) $(CFLAGS) $(INCLUDE) $(KernLib) $(OUT)
 
-copy : run/kernel.bin
+
+copy : run/kernel.bin run/a.bin
 
 	cp run/kernel.bin  /Volumes/ARESOS/
+run/a.bin : user/a.asm
+	nasm $(OUT)
+	dd if=run/a.bin of=run/diskb.img conv=notrunc
 
 start:
 	bochs -f run/bochsrc
