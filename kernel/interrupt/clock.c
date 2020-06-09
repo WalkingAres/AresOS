@@ -6,39 +6,64 @@
 
 extern int KernelStackTop;
 extern int StackTop;
+extern int k_reenter;
 
 char msg[] = "-\\|/";
 int i = 0;
+int j = 0;
 
-void clock(){
-    __asm__("pop %ebp\r\n");
-    __asm__("sub $4,%esp\r\n");
-    SAVE_REG();
-    __asm__ (
-            "mov   %ss,%dx\r\n"         //进入内核栈
-            "mov   %dx,%ds\r\n"
-            "mov   %dx,%es\r\n"
-            "movl   $StackTop,%esp"    //check!
-            );
+// void clock(){
+//     //__asm__("pop %ebp\r\n");
+//     __asm__("sub $4,%esp\r\n");
+//     SAVE_REG();
+//     __asm__ (
+//             "mov   %ss,%dx\r\n"         //进入内核栈
+//             "mov   %dx,%ds\r\n"
+//             "mov   %dx,%es\r\n"
+//             );
 
-    show(msg[i]);
-    i = (i+1) % 4;
+//     CLK_EOI();
 
-    get_time();
-    showtime();
-    out_byte(M_CTL,0x20);
+//     k_reenter++;
+//     if(k_reenter != 1) goto reenter;
 
-    __asm__(
-        "movl (p_proc_ready),%esp\r\n"           //check!
-        "lea 72(%esp),%eax\r\n"
-        "mov  $tss,%edx\r\n"
-        "movl %eax,4(%edx)"
-    );
+//     __asm__("movl  $StackTop,%esp\r\n");
 
-    RET_REG();
-    __asm__("add $4,%esp\r\n");
-    __asm__("sti\r\n");
-    __asm__("iret\r\n");
+//     __asm__("sti\r\n");             //中断重入（嵌套）
+
+//     show(msg[i]);
+//     i = (i+1) % 4;
+
+//     get_time();
+//     showtime();
+//     //printf("clock!");
+//     //for(j=0;j<1000000;j++);
+//     // out_byte(M_CTL,0x20);
+//     // __asm__("sti\r\n");
+//     //for(j=0;j<100000;j++);
+
+//     //put_char(clk_reenter+'0');
+
+//     __asm__("cli\r\n");
+
+//     __asm__(
+//         "movl (p_proc_ready),%esp\r\n"           //check!
+//         "lea 72(%esp),%eax\r\n"
+//         "mov  $tss,%edx\r\n"
+//         "movl %eax,4(%edx)"
+//     );
+// reenter:
+//     k_reenter--;
+//     RET_REG();
+//     __asm__("add $4,%esp\r\n");
+//    // __asm__("sti\r\n");
+//     __asm__("iret\r\n");
+// }
+
+void clock() {
+    save();
+    CLK_EOI();
+    __asm__("ret");
 }
 
 void init_clock() {

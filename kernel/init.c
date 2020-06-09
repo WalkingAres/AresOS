@@ -62,18 +62,37 @@ void init_idt() {
 
 }
 
+void delay() {
+    int i, j;
+    for(int i=0;i<100000;i++) j++;
+}
+
+
 void taskA() {
-    int i=0;
-    int j;
     printf("taskA is running!\r\n");
     while(1) {
-        //printf("A:");
+        printf("A:");
         //put_char('0'+i);
         // i++;
-        // if(i==10) i=0;
+       delay();
     }
     //printf("taskA!");
 }
+
+void taskB() {
+    printf("taskB is running!\r\n");
+    while(1) {
+        printf("B:");
+        //put_char('0'+i);
+        // i++;
+       delay();
+    }
+    //printf("taskA!");
+}
+
+
+
+int k_reenter;
 
 void init() {
     init_gdt();
@@ -103,6 +122,8 @@ void init() {
     p_proc->regs.eip = (uint32_t) taskA;
     p_proc->regs.esp = (uint32_t) Task_Stack+TASK_STACK_SIZE;
     p_proc->regs.eflags = 0x1202;
+
+    k_reenter = 0;
 
     return;   
 }

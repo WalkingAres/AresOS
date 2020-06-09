@@ -19,11 +19,15 @@
 #define TIME_VECTOR 0x28
 
 
+__attribute__((naked))  
+void save();
+
+__attribute__((naked))
+void restart();
 
 void enble_irq(uint8_t irq);
 
 void disable_irq(uint8_t irq);
-
 
 typedef void (*int_handler)();
 

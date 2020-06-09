@@ -60,6 +60,12 @@ void showtime() {
 
 void get_time() {
 
+    out_byte(TIME_INDEX_PORT,0xa);
+    if(in_byte(TIME_DATA_PORT) & 0x80 != 0) return;
+
+
+    //printf("time!");
+
     out_byte(TIME_INDEX_PORT,YEAR);
     _time.year = bcd_to_int(in_byte(TIME_DATA_PORT));
 
@@ -145,6 +151,9 @@ void init_time(){
     // out_byte(TIME_DATA_PORT, al);
     // al = in_byte(TIME_DATA_PORT);
     // printf(itoa(al,t));
+    // out_byte(TIME_INDEX_PORT,0xa);
+    // while( in_byte(TIME_DATA_PORT) & 0x80 != 0 ) ;
+
 
     out_byte(TIME_INDEX_PORT,0x0b);
     al = in_byte(TIME_DATA_PORT);
@@ -155,8 +164,7 @@ void init_time(){
     in_byte(TIME_DATA_PORT);
 
 
-
     set_intGate(TIME_VECTOR,time_handler);
-    enble_irq(TIME_IRQ);
+    //enble_irq(TIME_IRQ);
 
 }

@@ -4,6 +4,7 @@ global _start	; 导出 _start
 global restart
 global KernelStackTop
 global StackTop
+global pcb_ldt_sel
 
 extern kernel
 extern gdt_ptr
@@ -74,18 +75,18 @@ StackTop:		; 栈顶
 KernelStackSpace		resb	2 * 1024
 KernelStackTop:		; 栈顶
 
-restart:
-	mov esp, [p_proc_ready]
-	lldt	[esp+pcb_ldt_sel]
-	lea		eax, [esp + pcb_stacktop]
-	mov dword [tss+tss_sp0], eax
+;restart:
+;	mov esp, [p_proc_ready]
+;	lldt	[esp+pcb_ldt_sel]
+;	lea		eax, [esp + pcb_stacktop]
+;	mov dword [tss+tss_sp0], eax
 
-	pop gs
-	pop fs
-	pop es
-	pop ds
-	popad
-
-	add esp,4
-
-	iretd
+;	pop gs
+;	pop fs
+;	pop es
+;	pop ds
+;	popad
+;
+;	add esp,4
+;
+;	iretd
