@@ -1,12 +1,6 @@
 
 global out_byte
 global in_byte
-global LGDT
-global LIDT
-global CLI
-global STI
-global savereg
-global retreg
 global in_word
 global pro
 
@@ -100,9 +94,4 @@ in_word:
     ret
 
 
-pro:
-
-    call 0x40400
-
-    ret
 

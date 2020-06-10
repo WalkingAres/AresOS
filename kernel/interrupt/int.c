@@ -23,17 +23,17 @@ void save(){
     if(k_reenter != 0) goto reenter;
 
     __asm__(
-        "mov %esp,%eax\r\n"     //eax = pcb 起始地址
-        "movl  $StackTop,%esp\r\n"
+        "mov %esp,%edx\r\n"     //eax = pcb 起始地址
+        "movl  $StackTop,%esp\r\n"  //进入内核栈
         "push $restart\r\n"
-        "jmp *48(%eax)"
+        "jmp *48(%edx)"
         );
 
 reenter:
     __asm__(
-        "mov %esp,%eax\r\n"     //eax = pcb 起始地址
+        "mov %esp,%edx\r\n"     //eax = pcb 起始地址
         "push $restart_reenter\r\n"
-        "jmp *48(%eax)"
+        "jmp *48(%edx)"
     );
 }
 

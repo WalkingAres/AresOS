@@ -3,14 +3,14 @@
 #include "kernlib.h"
 #include "time.h"
 #include "pm.h"
+#include "proc.h"
 
 extern int KernelStackTop;
 extern int StackTop;
 extern int k_reenter;
 
 char msg[] = "-\\|/";
-int i = 0;
-int j = 0;
+int wheel;
 
 // void clock(){
 //     //__asm__("pop %ebp\r\n");
@@ -63,8 +63,21 @@ int j = 0;
 void clock() {
     save();
     CLK_EOI();
-    __asm__("ret");
+    clock_handler(0);
+    __asm__("ret");     // restart()
 }
+
+void clock_handler(int irq) {
+    FireWheel();
+    p_proc_ready++;
+    if(p_proc_ready >= proc_table + NUM_TASKS) p_proc_ready = proc_table;
+}
+
+void FireWheel() {
+    wheel = (wheel + 1)%4;
+    show(msg[wheel]);
+}
+
 
 void init_clock() {
 

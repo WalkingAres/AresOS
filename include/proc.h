@@ -31,7 +31,7 @@ typedef struct proc_stackframe {
     uint32_t ss;
 }StackFrame;
 
-typedef struct process
+typedef struct _process
 {
     StackFrame regs;
 
@@ -41,15 +41,28 @@ typedef struct process
     char p_name[16];
 }Process;
 
-#define NUM_TASKS 1
+typedef void (*_pTask) ();
+
+typedef struct _task
+{
+    _pTask eip;
+    int stacksize;
+    char name[32];
+}Task;
+
+
+#define NUM_TASKS 3
+
+Process *p_proc_ready;
+
+#define TASKA_STACK_SIZE 0x8000
+#define TASKB_STACK_SIZE 0x8000
+#define USER_STACK_SIZE  0x8000
+#define STACK_SIZE_TATAL  (TASKA_STACK_SIZE + TASKB_STACK_SIZE + USER_STACK_SIZE)
 
 Process proc_table[NUM_TASKS];
 
-Process *p_proc;
-Process *p_proc_ready;
 
-#define TASK_STACK_SIZE 0x8000
-
-uint8_t Task_Stack[TASK_STACK_SIZE];
+uint8_t Task_Stack[STACK_SIZE_TATAL];
 
 #endif

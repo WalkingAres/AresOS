@@ -13,7 +13,7 @@ void read_disk(uint32_t sec_num, uint8_t num, uint8_t * buf) {
     while( (in_byte(CTRL_PORT) & 0x80) != 0) ;
 
 
-    printf("not busy!");
+    //printf("not busy!");
 
 
     out_byte(NUM_PORT,num);
@@ -33,10 +33,10 @@ void read_disk(uint32_t sec_num, uint8_t num, uint8_t * buf) {
     while( (in_byte(CTRL_PORT) & 0x08) != 0x08) ;
 
 
-    printf("data ready!");
+    //printf("data ready!");
 
-    err = in_byte(0x1f1);
-    printf(itoa(err,t));
+    //err = in_byte(0x1f1);
+    //printf(itoa(err,t));
 
     int num_bytes = num*256;
     int i=0;
@@ -46,7 +46,7 @@ void read_disk(uint32_t sec_num, uint8_t num, uint8_t * buf) {
 
     //printf(itoa(p[0],t));
 
-    printf("@");
+    //printf("@");
 
     __asm__("sti\r\n");
 

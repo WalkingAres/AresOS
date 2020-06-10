@@ -1,5 +1,5 @@
 bits 32
-org 0x40400
+org 0x60400
 ;================= 常量定义 ===================
 
      Dn_Rt equ 1                  ;D-Down,U-Up,R-right,L-Left

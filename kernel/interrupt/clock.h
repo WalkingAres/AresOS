@@ -4,6 +4,10 @@
 __attribute__((naked))
 void clock();
 
+void clock_handler(int irq);
+
+void FireWheel();
+
 void init_clock();
 
 #define CLK_EOI()                       \
@@ -11,6 +15,5 @@ void init_clock();
             "movb   $0x20,%al\r\n"      \
             "outb   %al,$0x20"          \
             );
-
 
 #endif
