@@ -51,7 +51,7 @@ void help() {
 void cmd_time(){
     get_time();
     showtime();
-    printf("press any key to continue...");
+    printf("press any key to continue...\r\n");
     get_char();
 }
 
@@ -69,9 +69,14 @@ void _shell() {
     char cmd[100];
     cmd_key key;
     clear_screen();
+    //get_char();
+        __asm__(
+        "movl $1, %eax\r\n"
+        "int $0x80");
+    char s[]="hello Ares OS!\r\n";    
     while(1) {
         printf("@Ares >");
-        get_string(cmd);
+        scanf("%s",cmd);
         key  = get_cmd_key(cmd);
         switch (key)
         {
@@ -91,7 +96,7 @@ void _shell() {
             clear_screen();
             break;
         default:
-            printf("\r\ncommand not found!\r\n");
+            printf("\r\ncommand not found: %s\r\n",cmd);
             break;
         }
     }

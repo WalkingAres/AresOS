@@ -214,6 +214,9 @@ showMsg:
 	jnz pro
 	
 
+	mov eax, 1
+	int 0x80
+
 	ret 
          ; 停止画框，无限循环 
 

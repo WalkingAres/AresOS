@@ -179,12 +179,13 @@ void init()
     proc_table[0].priorty = 50;
     proc_table[1].priorty = 1;
 
-    proc_table[1].state = suspended;
+    proc_table[1].state = died;
     proc_table[2].state = died;
 
     SysCall_Table[0] = sys_0;
     SysCall_Table[1] = sys_1;
     set_intGate(0x80,syscall);
+    idt[0x80].attr = 0xae;
     k_reenter = 0;
 
     //disable_irq(CLOCK_IRQ);

@@ -45,21 +45,26 @@ void kernel(){
 
     //__asm__("int $0x21\r\n");
 
-    printf("hello world!\r\n");
-
+    //printf("hello world!\r\n");
+    //char s[] = "hello";
+    // printf("@Ares >%d%d",123,321);
+    // //printf("%s",s);
+    // get_char();
     //__asm__("int $0x21\r\n");
 
     //enble_irq(KEYBOARD_IRQ);
 
     //get_char();
     
+
     p_proc_ready = proc_table;
-    // __asm__(
-    //     "movl $1, %eax\r\n"
-    //     "int $0x80");
+    __asm__(
+        "movl $1, %eax\r\n"
+        "int $0x80");
     num_proc_alive = 2;
     //schedule();
-    load_program(4);
+    //get_char();
+    //load_program(4);
     restart();
     while(1) ;
 }

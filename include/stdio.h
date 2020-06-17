@@ -1,7 +1,9 @@
 #ifndef STDIO_H
 #define STDIO_H
 
-void printf(char *s);
+int printf(const char * format,...);
+
+int scanf(const char * format,...);
 
 void put_char(char ch);
 
