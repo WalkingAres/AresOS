@@ -4,6 +4,7 @@
 #include "time.h"
 #include "pm.h"
 #include "proc.h"
+#include "global.h"
 
 extern int KernelStackTop;
 extern int StackTop;
@@ -63,14 +64,21 @@ int wheel;
 void clock() {
     save();
     CLK_EOI();
+    __asm__("sti\r\n");
     clock_handler(0);
     __asm__("ret");     // restart()
 }
 
 void clock_handler(int irq) {
     FireWheel();
-    p_proc_ready++;
-    if(p_proc_ready >= proc_table + NUM_TASKS) p_proc_ready = proc_table;
+    // p_proc_ready->ticks--;
+    // if(p_proc_ready->ticks == 0) {
+    //     p_proc_ready->ticks = 5000;
+    //     p_proc_ready++;
+    //     if(p_proc_ready >= proc_table + num_proc_alive) p_proc_ready = proc_table;
+    // }
+    // else return;
+    schedule();
 }
 
 void FireWheel() {
@@ -81,9 +89,10 @@ void FireWheel() {
 
 void init_clock() {
 
+    //Ê±ÖÓÆµÂÊ 100hz
     out_byte(0x43,0x34);
-    out_byte(0x40,(uint8_t)119182/100);
-    out_byte(0x40,(uint8_t)(119182/100 >> 8));
+    out_byte(0x40,(uint8_t)1193182/100);
+    out_byte(0x40,(uint8_t)(1193182/100>> 8));
     
     set_intGate(CLOCK_VECTOR,clock);
     enble_irq(CLOCK_IRQ);

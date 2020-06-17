@@ -15,7 +15,7 @@ void show(char ch);
       
 #define USER_PRO_POINT 0x60400
 
-void load_program();
+void load_program(uint8_t id);
 
 //__attribute__((naked))
 void pro();

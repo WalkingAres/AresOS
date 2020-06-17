@@ -3,7 +3,6 @@
 #include "stdio.h"
 #include "string.h"
 
-char t[10];
 
 void read_disk(uint32_t sec_num, uint8_t num, uint8_t * buf) {
 

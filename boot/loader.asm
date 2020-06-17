@@ -41,23 +41,6 @@ LABEL_START:			; <--- 从这里开始 *************
 	mov	dh, 0			; "Loading  "
 	call	DispStrRealMode		; 显示字符串
 
-	; 得到内存数
-	mov	ebx, 0			; ebx = 后续值, 开始时需为 0
-	mov	di, _MemChkBuf		; es:di 指向一个地址范围描述符结构（Address Range Descriptor Structure）
-.MemChkLoop:
-	mov	eax, 0E820h		; eax = 0000E820h
-	mov	ecx, 20			; ecx = 地址范围描述符结构的大小
-	mov	edx, 0534D4150h		; edx = 'SMAP'
-	int	15h			; int 15h
-	jc	.MemChkFail
-	add	di, 20
-	inc	dword [_dwMCRNumber]	; dwMCRNumber = ARDS 的个数
-	cmp	ebx, 0
-	jne	.MemChkLoop
-	jmp	.MemChkOK
-.MemChkFail:
-	mov	dword [_dwMCRNumber], 0
-.MemChkOK:
 
 	; 下面在 A 盘的根目录寻找 KERNEL.BIN
 	mov	word [wSectorNo], SectorNoOfRootDirectory	
@@ -346,93 +329,12 @@ LABEL_PM_START:
 	mov	ss, ax
 	mov	esp, TopOfStack
 
-	;push	szMemChkTitle
-	;call	DispStr
-	;add	esp, 4
-
-	;call	DispMemInfo
-	;call	SetupPaging
-
-	mov	ah, 0Fh				; 0000: 黑底    1111: 白字
-	mov	al, 'P'
-	mov	[gs:((80 * 0 + 39) * 2)], ax	; 屏幕第 0 行, 第 39 列。
-
 	call	InitKernel
 
 	;jmp	$
 
 	;***************************************************************
 	jmp	SelectorFlatC:KernelEntryPointPhyAddr	; 正式进入内核 *
-	;***************************************************************
-	; 内存看上去是这样的：
-	;              ┃                                    ┃
-	;              ┃                 .                  ┃
-	;              ┃                 .                  ┃
-	;              ┃                 .                  ┃
-	;              ┣━━━━━━━━━━━━━━━━━━┫
-	;              ┃■■■■■■■■■■■■■■■■■■┃
-	;              ┃■■■■■■Page  Tables■■■■■■┃
-	;              ┃■■■■■(大小由LOADER决定)■■■■┃
-	;    00101000h ┃■■■■■■■■■■■■■■■■■■┃ PageTblBase
-	;              ┣━━━━━━━━━━━━━━━━━━┫
-	;              ┃■■■■■■■■■■■■■■■■■■┃
-	;    00100000h ┃■■■■Page Directory Table■■■■┃ PageDirBase  <- 1M
-	;              ┣━━━━━━━━━━━━━━━━━━┫
-	;              ┃□□□□□□□□□□□□□□□□□□┃
-	;       F0000h ┃□□□□□□□System ROM□□□□□□┃
-	;              ┣━━━━━━━━━━━━━━━━━━┫
-	;              ┃□□□□□□□□□□□□□□□□□□┃
-	;       E0000h ┃□□□□Expansion of system ROM □□┃
-	;              ┣━━━━━━━━━━━━━━━━━━┫
-	;              ┃□□□□□□□□□□□□□□□□□□┃
-	;       C0000h ┃□□□Reserved for ROM expansion□□┃
-	;              ┣━━━━━━━━━━━━━━━━━━┫
-	;              ┃□□□□□□□□□□□□□□□□□□┃ B8000h ← gs
-	;       A0000h ┃□□□Display adapter reserved□□□┃
-	;              ┣━━━━━━━━━━━━━━━━━━┫
-	;              ┃□□□□□□□□□□□□□□□□□□┃
-	;       9FC00h ┃□□extended BIOS data area (EBDA)□┃
-	;              ┣━━━━━━━━━━━━━━━━━━┫
-	;              ┃■■■■■■■■■■■■■■■■■■┃
-	;       90000h ┃■■■■■■■LOADER.BIN■■■■■■┃ somewhere in LOADER ← esp
-	;              ┣━━━━━━━━━━━━━━━━━━┫
-	;              ┃■■■■■■■■■■■■■■■■■■┃
-	;       80000h ┃■■■■■■■KERNEL.BIN■■■■■■┃
-	;              ┣━━━━━━━━━━━━━━━━━━┫
-	;              ┃■■■■■■■■■■■■■■■■■■┃
-	;       30000h ┃■■■■■■■■KERNEL■■■■■■■┃ 30400h ← KERNEL 入口 (KernelEntryPointPhyAddr)
-	;              ┣━━━━━━━━━━━━━━━━━━┫
-	;              ┃                                    ┃
-	;        7E00h ┃              F  R  E  E            ┃
-	;              ┣━━━━━━━━━━━━━━━━━━┫
-	;              ┃■■■■■■■■■■■■■■■■■■┃
-	;        7C00h ┃■■■■■■BOOT  SECTOR■■■■■■┃
-	;              ┣━━━━━━━━━━━━━━━━━━┫
-	;              ┃                                    ┃
-	;         500h ┃              F  R  E  E            ┃
-	;              ┣━━━━━━━━━━━━━━━━━━┫
-	;              ┃□□□□□□□□□□□□□□□□□□┃
-	;         400h ┃□□□□ROM BIOS parameter area □□┃
-	;              ┣━━━━━━━━━━━━━━━━━━┫
-	;              ┃◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇┃
-	;           0h ┃◇◇◇◇◇◇Int  Vectors◇◇◇◇◇◇┃
-	;              ┗━━━━━━━━━━━━━━━━━━┛ ← cs, ds, es, fs, ss
-	;
-	;
-	;		┏━━━┓		┏━━━┓
-	;		┃■■■┃ 我们使用 	┃□□□┃ 不能使用的内存
-	;		┗━━━┛		┗━━━┛
-	;		┏━━━┓		┏━━━┓
-	;		┃      ┃ 未使用空间	┃◇◇◇┃ 可以覆盖的内存
-	;		┗━━━┛		┗━━━┛
-	;
-	; 注：KERNEL 的位置实际上是很灵活的，可以通过同时改变 LOAD.INC 中的
-	;     KernelEntryPointPhyAddr 和 MAKEFILE 中参数 -Ttext 的值来改变。
-	;     比如把 KernelEntryPointPhyAddr 和 -Ttext 的值都改为 0x400400，
-	;     则 KERNEL 就会被加载到内存 0x400000(4M) 处，入口在 0x400400。
-	;
-
-
 
 
 ; ------------------------------------------------------------------------

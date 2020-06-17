@@ -5,7 +5,7 @@
 #include "stdio.h"
 #include "int.h"
 #include "keymap.h"
-
+#include "string.h"
 
 
 
@@ -15,14 +15,14 @@ static int shift_r      = 0;
 static int caps_lock    = 0;
 static int ctrl_flag    = 0;
 
+
 void keyboard_handler() {
 
-    __asm__("pusha\r\n");
-    __asm__("pushf\r\n");
+    save();
+
+    EOI_KB;
 
     uint8_t scan_code = in_byte(KB_READ_PORT);
-    
-    //printf("!");
 
     if(kb.count < KB_BUF_SIZE) {
         kb.code_buf[kb.head++] = scan_code;
@@ -30,15 +30,9 @@ void keyboard_handler() {
         if(kb.head == KB_BUF_SIZE ) kb.head = 0;
 
         kb.count++;
-
     }
 
-    __asm__("popf\r\n");
-    __asm__("popa\r\n");
-
-    out_byte(M_CTL,0x20);
-    __asm__("leave\r\n");
-    __asm__("iretl\r\n");
+    RET;
 }
 
 void init_keyboard() {
@@ -46,6 +40,11 @@ void init_keyboard() {
     kb.head = kb.tail = kb.rpos = kb.wpos = 0;
     kb.count = 0;
     kb.readcount = 0;
+    col_flag     = 0;
+    shift_l      = 0;
+    shift_r      = 0;
+    caps_lock    = 0;
+    ctrl_flag    = 0;
     set_intGate(KEYBOARD_VECTOR,keyboard_handler);
     //enble_irq(KEYBOARD_IRQ);
 }
@@ -60,13 +59,14 @@ void keyboard_read() {
     uint8_t * map_row;
 
     if(kb.count > 0) {
+        //printf("!");
         disable_irq(KEYBOARD_IRQ);
         //put_char(kb.count+'0');
         scan_code = kb.code_buf[kb.tail++];
         if(kb.tail == KB_BUF_SIZE) kb.tail = 0;
         kb.count = kb.count - 1;
         enble_irq(KEYBOARD_IRQ);
-
+        //printf(itoa(scan_code,t));
         switch (scan_code)
         {
         case 0xe1:
@@ -84,6 +84,7 @@ void keyboard_read() {
                 }
             
                 key = map_row[col_flag];
+                //printf(itoa(key,t));
                 switch (key)
                 {
                 case SHIFT_L:
@@ -111,7 +112,9 @@ void keyboard_read() {
         }
 
         if(key != 0) {
+            //printf("#");
             if(!ctrl_flag) put_char(key);
+            //put_char(ctrl_flag+'0');
             kb.input_buf[kb.wpos++] = key; 
             if(kb.wpos == KB_BUF_SIZE) kb.wpos = 0;
             kb.readcount++;

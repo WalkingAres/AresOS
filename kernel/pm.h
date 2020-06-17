@@ -12,7 +12,7 @@
 //每个任务的局部描述符
 #define LDT_SIZE	2
 
-
+//段描述符
 typedef struct descriptor {
     uint16_t limit_low;
     uint16_t base_low;
@@ -65,13 +65,13 @@ typedef struct s_tss {
 }TSS;
 
 
-uint32_t    gdt_pos;//指向表中最后一个描述符
+// uint32_t    gdt_pos;//指向表中最后一个描述符
 
-uint8_t		gdt_ptr[6];	/* 0~15:Limit  16~47:Base */
-DESCRIPTOR	gdt[GDT_SIZE];
-uint8_t		idt_ptr[6];	/* 0~15:Limit  16~47:Base */
-GATE		idt[IDT_SIZE];
-TSS			tss;
+// uint8_t		gdt_ptr[6];	/* 0~15:Limit  16~47:Base */
+// DESCRIPTOR	gdt[GDT_SIZE];
+// uint8_t		idt_ptr[6];	/* 0~15:Limit  16~47:Base */
+// GATE		idt[IDT_SIZE];
+// TSS			tss;
 
 #define SEG_32	0x4000	//32 位段
 #define SEG_LIMIT_4K	0x8000   //段界限粒度为 4K 字节

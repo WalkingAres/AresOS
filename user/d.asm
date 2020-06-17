@@ -1,41 +1,24 @@
-bits 16
+bits 32
+org 0x60400
 ;================= 常量定义 ===================
-
      Dn_Rt equ 1                  ;D-Down,U-Up,R-right,L-Left
      Up_Rt equ 2                  ;
      Up_Lt equ 3                  ;
      Dn_Lt equ 4                  ;
-     delay equ 50000					; 计时器延迟计数,用于控制画框的速度
-     ddelay equ 580					; 计时器延迟计数,用于控制画框的速度
+     delay equ 1500				; 计时器延迟计数,用于控制画框的速度
+     ddelay equ 1000				; 计时器延迟计数,用于控制画框的速度
 
-     ;org 0x600					; 程序加载到 cs : 8200h
 start:
-	;xor ax,ax					; AX = 0   程序加载到0000：100h才能正确执行
-    mov ax,cs
-	mov es,ax					; ES = 0
-	mov ds,ax					; DS = CS
-	mov es,ax					; ES = CS
-	mov ax,0B800h				; 文本窗口显存起始地址
-	mov gs,ax					; GS = B800h
+
 	mov byte[char],'@'
 
 ;程序启动延迟
-
-sdelay:
-	dec word[count]				; 递减计数变量
-	jnz sdelay					; >0：跳转;
-	mov word[count],delay
-	dec word[dcount]				; 递减计数变量
-    jnz sdelay
-	mov word[count],delay
-	mov word[dcount],ddelay
-
-	call refreshscr
 	call bdaryDraw
 
-	mov cx, 100					;设置程序结束时间
+	mov ecx, 100					;设置程序结束时间
+
 pro:
-	push cx
+	push ecx
 loop1:
 	dec word[count]				; 递减计数变量
 	jnz loop1					; >0：跳转;
@@ -47,22 +30,7 @@ loop1:
 	
 	;清除痕迹
 	mov al, 20h
-	mov [gs:bx],ax  		
-
-	;键盘控制移动，w-右上，d-右下，s-左下，a-左上
-	mov ah, 0x01
-	int 16h
-	jz s
-	mov ah, 0x00
-	int 16h
-	cmp al, 'd'
-	jz  DnRt
-	cmp al, 'w'
-	jz UpRt
-	cmp al, 'a'
-	jz UpLt
-	cmp al,'s'
-	jz DnLt
+	mov [gs:bx],ax 
 
 s: 
 	mov al,1
@@ -213,19 +181,19 @@ dl2ur:
 	
 show:
 	;显示姓名-msg
-	mov bx, 160*19 + 110 	;屏幕中央
-	mov cx, msglen
-	mov si, 0
-	mov di, 0
+	mov ebx, 160*19 + 110 	;屏幕中央
+	mov ecx, msglen
+	mov esi, 0
+	mov edi, 0
 showMsg:
-	mov al,byte[msg+si]
+	mov al,byte[msg+esi]
 	mov ah, 0x0f
-	mov [gs:bx+di],  ax
-	inc si
-	add di,2
+	mov [gs:ebx+edi],  ax
+	inc esi
+	add edi,2
 	loop showMsg
 
-    xor ax,ax                 ; 计算显存地址
+    xor eax,eax                 ; 计算显存地址
     mov ax,word[x]
 	mov bx,80
 	mul bx
@@ -237,24 +205,13 @@ showMsg:
 	mov al,byte[char]		;  AL = 显示字符值（默认值为20h=空格符）
 	mov [gs:bx],ax  		;  显示字符的ASCII码值
 
-	pop cx
-	dec cx
-	cmp cx,0
+	pop ecx
+	dec ecx
+	cmp ecx,0
 	jnz pro
 	
-	call refreshscr
 
 	ret 
-         ; 停止画框，无限循环 
-
-;================= 清空屏幕 ===============
-refreshscr:
-	mov ax, 0x0600
-	mov bh, 0x07
-	mov cx, 0x0
-	mov dx, 0x184f
-	INT 0x10
-	ret
 
 ;================= 边框绘制 ===============
 bdaryDraw:

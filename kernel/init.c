@@ -9,6 +9,8 @@
 #include "keyboard.h"
 #include "time.h"
 #include "proc.h"
+#include "global.h"
+#include "syscall.h"
 
 void init_gdt()
 {
@@ -76,30 +78,31 @@ void init_idt()
 void delay()
 {
     int i, j;
-    for (int i = 0; i < 1000000; i++)
+    for (int i = 0; i < 100000; i++)
         j++;
 }
 
 void taskA()
 {
-    printf("taskA is running!\r\n");
     while (1)
     {
-        printf("A:");
-        //put_char('0'+i);
-        // i++;
-        delay();
+        get_time();
+        showtime();
         delay();
     }
-    //printf("taskA!");
 }
 
 void taskB()
 {
-    printf("taskB is running!\r\n");
+    //printf("taskB is running!\r\n");
+    char t[10];
     while (1)
     {
-        printf("B:");
+        printf(itoa(proc_table[1].ticks,t));
+        printf("B");
+        //__asm__(
+        // "movl $1, %eax\r\n"
+        // "int $0x80");
         //put_char('0'+i);
         // i++;
         delay();
@@ -107,12 +110,26 @@ void taskB()
     //printf("taskA!");
 }
 
+void sys_1(){
+        printf("syscall_1");
+        //put_char('0'+i);
+        // i++;
+        delay();
+}
+void sys_0(){
+        printf("syscall_0");
+        //put_char('0'+i);
+        // i++;
+        delay();
+}
+
+extern void _shell(void);
 
 int k_reenter;
 Task    task_table[NUM_TASKS]={
-    {taskA,TASKA_STACK_SIZE,"A"},
-    {taskB,TASKB_STACK_SIZE,"B"},
-    {pro,USER_STACK_SIZE,"User pro"}
+    {_shell,TASKA_STACK_SIZE,"shell"},
+    {taskA,TASKB_STACK_SIZE,"B"},
+    {sys_0,USER_STACK_SIZE,"User pro"}
 };
 
 void init()
@@ -151,12 +168,23 @@ void init()
         proc->regs.esp = (uint32_t)task_stack;
         proc->regs.eflags = 0x1202;
 
+        proc->ticks = 20;
+        proc->state = suspended;
         task_stack = task_stack - task->stacksize;
         proc++;
         task++;
         ldt_sel = ldt_sel + 8;
     }
 
+    proc_table[0].priorty = 50;
+    proc_table[1].priorty = 1;
+
+    proc_table[1].state = suspended;
+    proc_table[2].state = died;
+
+    SysCall_Table[0] = sys_0;
+    SysCall_Table[1] = sys_1;
+    set_intGate(0x80,syscall);
     k_reenter = 0;
 
     //disable_irq(CLOCK_IRQ);

@@ -1,5 +1,6 @@
 #include "pm.h"
 #include "int.h"
+#include "global.h"
 
 void init_gdt_dspt(DESCRIPTOR * dspt,uint32_t base, uint32_t limit, uint16_t attr) {
     dspt->limit_low = limit & 0x0ffff;

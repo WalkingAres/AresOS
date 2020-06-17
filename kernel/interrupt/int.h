@@ -19,6 +19,8 @@
 #define TIME_VECTOR 0x28
 
 
+#define RET __asm__("ret\r\n");
+
 __attribute__((naked))  
 void save();
 

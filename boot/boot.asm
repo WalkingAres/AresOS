@@ -6,7 +6,7 @@ org 0x7c00
 
 BaseOfStack		equ	07c00h	; Boot状态下堆栈基地址(栈底, 从这个位置向低地址生长)
 
-BaseOfLoader		equ	09000h	; LOADER.BIN 被加载到的位置 ----  段地址
+BaseOfLoader		equ	30400h	; LOADER.BIN 被加载到的位置 ----  段地址
 OffsetOfLoader		equ	0100h	; LOADER.BIN 被加载到的位置 ---- 偏移地址
 ;================================================================================================
 

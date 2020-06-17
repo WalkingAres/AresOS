@@ -4,6 +4,7 @@
 #include "def.h"
 #include "pm.h"
 
+typedef uint32_t _pid;
 
 typedef struct proc_stackframe {
 
@@ -31,17 +32,27 @@ typedef struct proc_stackframe {
     uint32_t ss;
 }StackFrame;
 
+typedef enum _proc_state{
+    alive,
+    suspended,
+    died
+}_proc_state;
+
 typedef struct _process
 {
     StackFrame regs;
 
     uint16_t ldt_sel;
     DESCRIPTOR ldts[LDT_SIZE];
+
+    uint32_t ticks;
+    uint32_t priorty;
+    _proc_state state;
     uint32_t pid;
     char p_name[16];
 }Process;
 
-typedef void (*_pTask) ();
+typedef void (*_pTask)();
 
 typedef struct _task
 {
@@ -50,19 +61,11 @@ typedef struct _task
     char name[32];
 }Task;
 
-
-#define NUM_TASKS 3
-
-Process *p_proc_ready;
-
-#define TASKA_STACK_SIZE 0x8000
-#define TASKB_STACK_SIZE 0x8000
-#define USER_STACK_SIZE  0x8000
-#define STACK_SIZE_TATAL  (TASKA_STACK_SIZE + TASKB_STACK_SIZE + USER_STACK_SIZE)
-
-Process proc_table[NUM_TASKS];
+void schedule(void);
 
 
-uint8_t Task_Stack[STACK_SIZE_TATAL];
+typedef void * _funcptr;
+
+void exec();
 
 #endif
