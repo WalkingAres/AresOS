@@ -24,8 +24,9 @@ void save(){
     k_reenter++;
     if(k_reenter != 0) goto reenter;
 
+
     __asm__(
-        "mov %esp,%edx\r\n"     //edx = pcb 起始地址
+        "movl %esp,%edx\r\n"     //edx = pcb 起始地址
         "movl  $StackTop,%esp\r\n"  //进入内核栈
         "push $restart\r\n"
         "jmp *48(%edx)"        //回到clock()
@@ -33,7 +34,8 @@ void save(){
 
 reenter:
     __asm__(
-        "mov %esp,%edx\r\n"     //edx = pcb 起始地址
+        "reenter:\r\n"
+        "movl %esp,%edx\r\n"     //edx = pcb 起始地址
         "push $restart_reenter\r\n"
         "jmp *48(%edx)"        
     ); 
@@ -41,7 +43,7 @@ reenter:
 
 void restart() {
     __asm__(
-        "movl (p_proc_ready),%esp\r\n"           //check!
+        "movl (proc_current),%esp\r\n"           //check!
         "lldt pcb_ldt_sel(%esp)\r\n"             //pcb_ldt_sel = 72
         "lea 72(%esp),%eax\r\n"                  //
         "mov  $tss,%edx\r\n"

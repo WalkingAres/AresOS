@@ -1,5 +1,5 @@
 bits 32
-org 0x60400
+org 0x61000
 ;================= 常量定义 ===================
      Dn_Rt equ 1                  ;D-Down,U-Up,R-right,L-Left
      Up_Rt equ 2                  ;
@@ -210,7 +210,8 @@ showMsg:
 	cmp ecx,0
 	jnz pro
 	
-
+	mov eax, 1
+	int 0x80
 	ret 
 
 ;================= 边框绘制 ===============
@@ -218,7 +219,7 @@ bdaryDraw:
 	mov bx, 160*12+80
 	mov ah, 0x0f
 	mov al, byte[bdaryrow]
-	mov cx, 40
+	mov ecx, 40
 	mov di, 0
 row:
 	mov [gs:bx+di], ax
@@ -228,7 +229,7 @@ row:
 	mov al, byte[bdarycol]
 	mov bx, 160*12+80
 	mov di, 0
-	mov cx, 13
+	mov ecx, 13
 col:
 	mov [gs:bx+di], ax
 	add di, 160

@@ -3,7 +3,12 @@
 
 #include "int.h"
 
-typedef void (*_ptr_syscall) (void);
+typedef void *_ptr_syscall;
+
+typedef void (*_ptr_syscall0)(void);
+
+typedef void (*_ptr_syscall1)(void *);
+
 
 __attribute__((naked))
 void syscall();

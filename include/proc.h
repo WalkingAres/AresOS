@@ -35,6 +35,7 @@ typedef struct proc_stackframe {
 typedef enum _proc_state{
     alive,
     suspended,
+    sleep,
     died
 }_proc_state;
 
@@ -49,6 +50,7 @@ typedef struct _process
     uint32_t priorty;
     _proc_state state;
     uint32_t pid;
+
     char p_name[16];
 }Process;
 
@@ -67,5 +69,9 @@ void schedule(void);
 typedef void * _funcptr;
 
 void exec();
+
+void init_exec(_funcptr func);
+
+void init_mulpro();
 
 #endif

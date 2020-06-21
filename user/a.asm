@@ -216,7 +216,6 @@ showMsg:
 
 	mov eax, 1
 	int 0x80
-
 	ret 
          ; 停止画框，无限循环 
 
@@ -252,7 +251,7 @@ datadef:
     x    dw 7			;字符所在行
     y    dw 0			;字符所在列
     char db 'A'
-	msg  db 'LuoRenLiang p1'		;姓名
+	msg  db 'LuoRenLiang p1',0		;姓名
 	msglen equ ($-msg)
 	bdaryrow db '-'
 	bdarycol db '|'

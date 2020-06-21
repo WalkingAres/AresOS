@@ -71,13 +71,7 @@ void clock() {
 
 void clock_handler(int irq) {
     FireWheel();
-    // p_proc_ready->ticks--;
-    // if(p_proc_ready->ticks == 0) {
-    //     p_proc_ready->ticks = 5000;
-    //     p_proc_ready++;
-    //     if(p_proc_ready >= proc_table + num_proc_alive) p_proc_ready = proc_table;
-    // }
-    // else return;
+    proc_current->ticks--;
     schedule();
 }
 

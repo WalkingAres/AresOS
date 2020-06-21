@@ -1,5 +1,5 @@
 bits 32
-org 0x60400
+org 0x60800
 ;================= 常量定义 ===================
 
      Dn_Rt equ 1                  ;D-Down,U-Up,R-right,L-Left
@@ -213,28 +213,31 @@ showMsg:
 	jnz pro
 	
 
+	mov eax, 1
+	int 0x80
+
 	ret 
          ; 停止画框，无限循环 
 
 ;================= 边框绘制 ===============
 bdaryDraw:
-	mov bx, 160*12+80
+	mov ebx, 160*12+80
 	mov ah, 0x0f
 	mov al, byte[bdaryrow]
-	mov cx, 40
-	mov di, 0
+	mov ecx, 40
+	mov edi, 0
 row:
 	mov [gs:bx+di], ax
 	add di, 2
 	loop row 
 
 	mov al, byte[bdarycol]
-	mov bx, 80
-	mov di, 0
-	mov cx, 12
+	mov ebx, 80
+	mov edi, 0
+	mov ecx, 12
 col:
-	mov [gs:bx+di], ax
-	add di, 160
+	mov [gs:ebx+edi], ax
+	add edi, 160
 	loop col
 
 	ret

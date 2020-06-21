@@ -18,19 +18,20 @@ GATE		idt[IDT_SIZE];
 TSS			tss;
 
 //**** 进程相关的数据
-#define NUM_TASKS 3     //最大线程数
+#define NUM_TASKS 10     //最大线程数
 int num_proc_alive;     //当前的线程
 
-Process *p_proc_ready;  
+// Process *p_proc_ready;
+Process *proc_current;  
 
-#define TASKA_STACK_SIZE 0x8000
-#define TASKB_STACK_SIZE 0x8000
-#define USER_STACK_SIZE  0x8000
+#define TASKA_STACK_SIZE 0x1000
+#define TASKB_STACK_SIZE 0x1000
+#define USER_STACK_SIZE  0x1000
 #define STACK_SIZE_TATAL  (TASKA_STACK_SIZE + TASKB_STACK_SIZE + USER_STACK_SIZE)
 
 Process proc_table[NUM_TASKS];          //进程表
 
-uint8_t Task_Stack[STACK_SIZE_TATAL];   //进程栈
+uint8_t Task_Stack[TASKA_STACK_SIZE*10];   //进程栈
 
 //**** 系统调用
 #define NUM_SYSCALLS 10
@@ -40,6 +41,8 @@ _ptr_syscall SysCall_Table[NUM_SYSCALLS];
 // #define NUM_INTS 16
 // int_handler Int_Table[NUM_INTS];
 
+extern void mulpro();
+extern int k_reenter;
 
 void kernel(){
 
@@ -55,13 +58,13 @@ void kernel(){
     //enble_irq(KEYBOARD_IRQ);
 
     //get_char();
-    
-
-    p_proc_ready = proc_table;
-    __asm__(
-        "movl $1, %eax\r\n"
-        "int $0x80");
+    proc_current = proc_table+1;
+    // __asm__(
+    //     "movl $1, %eax\r\n"
+    //     "int $0x80");
     num_proc_alive = 2;
+    //mulpro();
+    //printf("%d",proc_current->pid);
     //schedule();
     //get_char();
     //load_program(4);

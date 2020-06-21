@@ -43,7 +43,7 @@ void init_gdt()
                   sizeof(tss) - 1, SEG_386TSS);
     tss.iobase = sizeof(tss);
 
-    *limit = 63;
+    *limit = 0xffff;
 }
 
 void init_8259A()
@@ -78,7 +78,7 @@ void init_idt()
 void delay()
 {
     int i, j;
-    for (int i = 0; i < 100000; i++)
+    for (int i = 0; i < 10000; i++)
         j++;
 }
 
@@ -114,6 +114,10 @@ void sys_1(){
         printf("syscall_1");
         //put_char('0'+i);
         // i++;
+        proc_table[0].state = suspended;
+        int i;
+        for(i=3;i<=6;i++) proc_table[i].state = died;
+        schedule();
         delay();
 }
 void sys_0(){
@@ -123,9 +127,14 @@ void sys_0(){
         delay();
 }
 
+void sys_2(char *s) {
+    printf("%s!\r\n",s);
+}
+
 extern void _shell(void);
 
 int k_reenter;
+
 Task    task_table[NUM_TASKS]={
     {_shell,TASKA_STACK_SIZE,"shell"},
     {taskA,TASKB_STACK_SIZE,"B"},
@@ -169,8 +178,9 @@ void init()
         proc->regs.eflags = 0x1202;
 
         proc->ticks = 20;
-        proc->state = suspended;
-        task_stack = task_stack - task->stacksize;
+        proc->state = died;
+        proc->priorty = 10;
+        task_stack = task_stack - TASKA_STACK_SIZE;
         proc++;
         task++;
         ldt_sel = ldt_sel + 8;
@@ -179,11 +189,13 @@ void init()
     proc_table[0].priorty = 50;
     proc_table[1].priorty = 1;
 
-    proc_table[1].state = died;
+    proc_table[0].state = suspended;
+    proc_table[1].state = suspended;
     proc_table[2].state = died;
 
     SysCall_Table[0] = sys_0;
     SysCall_Table[1] = sys_1;
+    SysCall_Table[2] = sys_2;
     set_intGate(0x80,syscall);
     idt[0x80].attr = 0xae;
     k_reenter = 0;

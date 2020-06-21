@@ -13,7 +13,7 @@ extern init_gdt
 extern init_idt
 extern init
 extern clock
-extern p_proc_ready
+extern proc_current
 extern tss
 
 Sel_Tss equ 0x20

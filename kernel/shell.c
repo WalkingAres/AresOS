@@ -11,7 +11,8 @@ typedef enum shell_cmd {
     C,
     D,
     TIME,
-    CLEAR
+    CLEAR,
+    MULPRO
 }cmd_key;
 
 
@@ -25,6 +26,7 @@ cmd_key get_cmd_key(const char * cmd) {
     if(!strcmp(cmd,"c")) return C;
     if(!strcmp(cmd,"d")) return D;
     if(!strcmp(cmd,"clear")) return CLEAR;
+    if(!strcmp(cmd,"mulpro")) return MULPRO;
 }
 
 void clear_screen() {
@@ -57,23 +59,30 @@ void cmd_time(){
 
 void user_pro(cmd_key key) {
     clear_screen();
-    enble_irq(KEYBOARD_IRQ);
     load_program(key);
     exec();
+    printf("\r\npress any key to continue...\r\n");
+    get_char();
     clear_screen();
-    disable_irq(KEYBOARD_IRQ);
 }
 
+
+void mulpro() {
+    clear_screen();
+    int i;
+    for(int i=1;i<=4;i++) load_program(i);
+    init_mulpro();
+    get_char();
+    clear_screen();
+    
+}
 
 void _shell() {
     char cmd[100];
     cmd_key key;
     clear_screen();
     //get_char();
-        __asm__(
-        "movl $1, %eax\r\n"
-        "int $0x80");
-    char s[]="hello Ares OS!\r\n";    
+    char s[]="hello Ares OS!\r\n"; 
     while(1) {
         printf("@Ares >");
         scanf("%s",cmd);
@@ -95,6 +104,8 @@ void _shell() {
         case CLEAR:
             clear_screen();
             break;
+        case MULPRO:
+            mulpro();
         default:
             printf("\r\ncommand not found: %s\r\n",cmd);
             break;

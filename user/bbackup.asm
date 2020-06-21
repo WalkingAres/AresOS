@@ -1,35 +1,36 @@
 bits 32
-org 0x60c00
-;================= å¸¸é‡å®šä¹‰ ===================
+org 0x60800
+;================= ³£Á¿¶¨Òå ===================
+
      Dn_Rt equ 1                  ;D-Down,U-Up,R-right,L-Left
      Up_Rt equ 2                  ;
      Up_Lt equ 3                  ;
      Dn_Lt equ 4                  ;
-     delay equ 1500				; è®¡æ—¶å™¨å»¶è¿Ÿè®¡æ•°,ç”¨äºæ§åˆ¶ç”»æ¡†çš„é€Ÿåº¦
-     ddelay equ 1000				; è®¡æ—¶å™¨å»¶è¿Ÿè®¡æ•°,ç”¨äºæ§åˆ¶ç”»æ¡†çš„é€Ÿåº¦
+     delay equ 1500				; ¼ÆÊ±Æ÷ÑÓ³Ù¼ÆÊı,ÓÃÓÚ¿ØÖÆ»­¿òµÄËÙ¶È
+     ddelay equ 1000				; ¼ÆÊ±Æ÷ÑÓ³Ù¼ÆÊı,ÓÃÓÚ¿ØÖÆ»­¿òµÄËÙ¶È
 
-     ;org 0x600					; ç¨‹åºåŠ è½½åˆ° cs : 8200h
+     ;org 0x600					; ³ÌĞò¼ÓÔØµ½ cs : 8200h
 start:
 
 	mov byte[char],'@'
 
-;ç¨‹åºå¯åŠ¨å»¶è¿Ÿ
+;³ÌĞòÆô¶¯ÑÓ³Ù
 	call bdaryDraw
 
-	mov ecx, 100					;è®¾ç½®ç¨‹åºç»“æŸæ—¶é—´
+	mov ecx, 100					;ÉèÖÃ³ÌĞò½áÊøÊ±¼ä
 
 pro:
 	push ecx
 loop1:
-	dec word[count]				; é€’å‡è®¡æ•°å˜é‡
-	jnz loop1					; >0ï¼šè·³è½¬;
+	dec word[count]				; µİ¼õ¼ÆÊı±äÁ¿
+	jnz loop1					; >0£ºÌø×ª;
 	mov word[count],delay
-	dec word[dcount]				; é€’å‡è®¡æ•°å˜é‡
+	dec word[dcount]				; µİ¼õ¼ÆÊı±äÁ¿
     jnz loop1
 	mov word[count],delay
 	mov word[dcount],ddelay
 	
-	;æ¸…é™¤ç—•è¿¹
+	;Çå³ıºÛ¼£
 	mov al, 20h
 	mov [gs:bx],ax 
 
@@ -53,24 +54,24 @@ DnRt:
 	inc word[x]
 	inc word[y]
 	mov bx,word[x]
-	mov ax,25
+	mov ax,12
 	sub ax,bx
       jz  dr2ur
 	mov bx,word[y]
-	mov ax,40
+	mov ax,80
 	sub ax,bx
       jz  dr2dl
 	jmp show
 dr2ur:
 	  mov bx, word[y]
-	  mov ax, 40
+	  mov ax, 80
 	  sub ax, bx
 	  jz dr2ul 
-      mov word[x],23
+      mov word[x],10
       mov byte[rdul],Up_Rt	
       jmp show
 dr2dl:
-      mov word[y],38
+      mov word[y],78
       mov byte[rdul],Dn_Lt	
       jmp show
 
@@ -85,24 +86,24 @@ UpRt:
 	dec word[x]
 	inc word[y]
 	mov bx,word[y]
-	mov ax,40
+	mov ax,80
 	sub ax,bx
       jz  ur2ul
 	mov bx,word[x]
-	mov ax,12
+	mov ax, -1
 	sub ax,bx
       jz  ur2dr
 	jmp show
 ur2ul:
 	  mov bx,word[x]
-	  mov ax,12
+	  mov ax,-1
 	  sub ax,bx
       jz  ur2dl
-      mov word[y],38
+      mov word[y],78
       mov byte[rdul],Up_Lt	
       jmp show
 ur2dr:
-      mov word[x],14
+      mov word[x],1
       mov byte[rdul],Dn_Rt	
       jmp show
 
@@ -117,25 +118,25 @@ UpLt:
 	dec word[x]
 	dec word[y]
 	mov bx,word[x]
-	mov ax,12
+	mov ax,-1
 	sub ax,bx
       jz  ul2dl
 	mov bx,word[y]
-	mov ax,-1
+	mov ax,40
 	sub ax,bx
       jz  ul2ur
 	jmp show
 
 ul2dl:
 	  mov bx,word[y]
-	  mov ax,-1
+	  mov ax,40
 	  sub ax,bx
       jz  ul2dr
-      mov word[x],14
+      mov word[x],1
       mov byte[rdul],Dn_Lt	
       jmp show
 ul2ur:
-      mov word[y],1
+      mov word[y],42
       mov byte[rdul],Up_Rt	
       jmp show
 
@@ -151,26 +152,26 @@ DnLt:
 	inc word[x]
 	dec word[y]
 	mov bx,word[y]
-	mov ax,-1
+	mov ax,40
 	sub ax,bx
       jz  dl2dr
 	mov bx,word[x]
-	mov ax,25
+	mov ax,12
 	sub ax,bx
       jz  dl2ul
 	jmp show
 
 dl2dr:
 	  mov bx,word[x]
- 	  mov ax,25
+ 	  mov ax,12
 	  sub ax,bx
       jz  dl2ur
-      mov word[y],1
+      mov word[y],42
       mov byte[rdul],Dn_Rt	
       jmp show
 	
 dl2ul:
-      mov word[x],23
+      mov word[x],10
       mov byte[rdul],Up_Lt	
       jmp show
 
@@ -181,8 +182,8 @@ dl2ur:
 	jmp show
 	
 show:
-	;æ˜¾ç¤ºå§“å-msg
-	mov ebx, 160*19 + 30 	;å±å¹•ä¸­å¤®
+	;ÏÔÊ¾ĞÕÃû-msg
+	mov ebx, 160*5 + 110 	;ÆÁÄ»ÖĞÑë
 	mov ecx, msglen
 	mov esi, 0
 	mov edi, 0
@@ -194,7 +195,7 @@ showMsg:
 	add edi,2
 	loop showMsg
 
-    xor eax,eax                 ; è®¡ç®—æ˜¾å­˜åœ°å€
+    xor eax,eax                 ; ¼ÆËãÏÔ´æµØÖ·
     mov ax,word[x]
 	mov bx,80
 	mul bx
@@ -202,30 +203,27 @@ showMsg:
 	mov bx,2
 	mul bx
 	mov bx,ax
-	mov ah,0Fh				;  0000ï¼šé»‘åº•ã€1111ï¼šäº®ç™½å­—ï¼ˆé»˜è®¤å€¼ä¸º07hï¼‰
-	mov al,byte[char]		;  AL = æ˜¾ç¤ºå­—ç¬¦å€¼ï¼ˆé»˜è®¤å€¼ä¸º20h=ç©ºæ ¼ç¬¦ï¼‰
-	mov [gs:bx],ax  		;  æ˜¾ç¤ºå­—ç¬¦çš„ASCIIç å€¼
+	mov ah,0Fh				;  0000£ººÚµ×¡¢1111£ºÁÁ°××Ö£¨Ä¬ÈÏÖµÎª07h£©
+	mov al,byte[char]		;  AL = ÏÔÊ¾×Ö·ûÖµ£¨Ä¬ÈÏÖµÎª20h=¿Õ¸ñ·û£©
+	mov [gs:bx],ax  		;  ÏÔÊ¾×Ö·ûµÄASCIIÂëÖµ
 
 	pop ecx
 	dec ecx
 	cmp ecx,0
 	jnz pro
 	
-
-
 	mov eax, 1
 	int 0x80
+
 	ret 
-         ; åœæ­¢ç”»æ¡†ï¼Œæ— é™å¾ªç¯ 
+         ; Í£Ö¹»­¿ò£¬ÎŞÏŞÑ­»· 
 
-
-
-;================= è¾¹æ¡†ç»˜åˆ¶ ===============
+;================= ±ß¿ò»æÖÆ ===============
 bdaryDraw:
-	mov bx, 160*12
+	mov bx, 160*12+80
 	mov ah, 0x0f
 	mov al, byte[bdaryrow]
-	mov ecx, 40
+	mov cx, 40
 	mov di, 0
 row:
 	mov [gs:bx+di], ax
@@ -233,9 +231,9 @@ row:
 	loop row 
 
 	mov al, byte[bdarycol]
-	mov bx, 160*12+80
+	mov bx, 80
 	mov di, 0
-	mov ecx, 13
+	mov cx, 12
 col:
 	mov [gs:bx+di], ax
 	add di, 160
@@ -243,15 +241,15 @@ col:
 
 	ret
 
-;================= æ•°æ®åŒº =================
+;================= Êı¾İÇø =================
 datadef:	
     count dw delay
     dcount dw ddelay
-    rdul db Dn_Rt         ; å‘å³ä¸‹è¿åŠ¨
-    x    dw 19			;å­—ç¬¦æ‰€åœ¨è¡Œ
-    y    dw 0			;å­—ç¬¦æ‰€åœ¨åˆ—
+    rdul db Dn_Rt         ; ÏòÓÒÏÂÔË¶¯
+    x    dw 7			;×Ö·ûËùÔÚĞĞ
+    y    dw 40			;×Ö·ûËùÔÚÁĞ
     char db 'A'
-	msg  db 'LuoRenLiang p3'		;å§“å
+	msg  db 'LuoRenLiang p2'		;ĞÕÃû
     msglen equ ($-msg)
 	bdaryrow db '-'
 	bdarycol db '|'
