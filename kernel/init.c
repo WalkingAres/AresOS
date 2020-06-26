@@ -75,6 +75,13 @@ void init_idt()
         set_intGate(i, 0x0);
 }
 
+void init_mm() {
+    MemHead = (MemBlock *)MEM_ADDR;
+    MemHead->addr = MEM_ADDR + HEAD_SIZE;
+    MemHead->next = NULL;
+    MemHead->size = 0x1000000;
+}
+
 void delay()
 {
     int i, j;
@@ -86,9 +93,11 @@ void taskA()
 {
     while (1)
     {
+        __asm__("cli\r\n");
         get_time();
         showtime();
-        delay();
+        //delay();
+        __asm__("sti\r\n");
     }
 }
 
@@ -114,11 +123,12 @@ void sys_1(){
         printf("syscall_1");
         //put_char('0'+i);
         // i++;
-        proc_table[0].state = suspended;
-        int i;
-        for(i=3;i<=6;i++) proc_table[i].state = died;
+        proc_table[0].state = READY;
+        // int i;
+        // for(i=3;i<=6;i++) proc_table[i].state = DIED;
+        proc_current->state = DIED;
         schedule();
-        delay();
+        // delay();
 }
 void sys_0(){
         printf("syscall_0");
@@ -136,9 +146,7 @@ extern void _shell(void);
 int k_reenter;
 
 Task    task_table[NUM_TASKS]={
-    {_shell,TASKA_STACK_SIZE,"shell"},
-    {taskA,TASKB_STACK_SIZE,"B"},
-    {sys_0,USER_STACK_SIZE,"User pro"}
+    {_shell,TASK_STACK_SIZE,"shell"}
 };
 
 void init()
@@ -153,9 +161,11 @@ void init()
 
     init_time();
 
+    init_mm();
+
     Task *task = task_table;
     Process *proc = proc_table;
-    char *task_stack = Task_Stack + STACK_SIZE_TATAL;
+    char *task_stack = Task_Stack + TASK_STACK_SIZE*10;
     uint32_t ldt_sel = SelectorLDT;
     int i;
     for (i = 0; i < NUM_TASKS; i++)
@@ -178,9 +188,9 @@ void init()
         proc->regs.eflags = 0x1202;
 
         proc->ticks = 20;
-        proc->state = died;
+        proc->state = DIED;
         proc->priorty = 10;
-        task_stack = task_stack - TASKA_STACK_SIZE;
+        task_stack = task_stack - TASK_STACK_SIZE;
         proc++;
         task++;
         ldt_sel = ldt_sel + 8;
@@ -189,9 +199,7 @@ void init()
     proc_table[0].priorty = 50;
     proc_table[1].priorty = 1;
 
-    proc_table[0].state = suspended;
-    proc_table[1].state = suspended;
-    proc_table[2].state = died;
+    proc_table[0].state = READY;
 
     SysCall_Table[0] = sys_0;
     SysCall_Table[1] = sys_1;
@@ -200,6 +208,11 @@ void init()
     idt[0x80].attr = 0xae;
     k_reenter = 0;
 
+    procCurrent->pproc = proc_table;
+    procCurrent->next = procCurrent;
+
+    procDied = NULL;
+    procSleep = NULL;
     //disable_irq(CLOCK_IRQ);
 
     return;

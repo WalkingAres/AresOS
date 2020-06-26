@@ -7,6 +7,7 @@
 #include "clock.h"
 #include "proc.h"
 #include "syscall.h"
+#include "malloc.h"
 
 //**** 保护模式
 uint32_t    gdt_pos;//指向表中最后一个描述符
@@ -22,16 +23,22 @@ TSS			tss;
 int num_proc_alive;     //当前的线程
 
 // Process *p_proc_ready;
-Process *proc_current;  
+Process *proc_current;
 
-#define TASKA_STACK_SIZE 0x1000
-#define TASKB_STACK_SIZE 0x1000
+ProcNode *procCurrent;  //cpu 正在执行的线程
+ProcNode *procReady;    //准备就绪的线程队列
+ProcNode *procDied;     //结束线程队列
+ProcNode *procSleep;    //阻塞或挂起的线程队列
+
+#define TASK_STACK_SIZE 0x1000
 #define USER_STACK_SIZE  0x1000
-#define STACK_SIZE_TATAL  (TASKA_STACK_SIZE + TASKB_STACK_SIZE + USER_STACK_SIZE)
 
 Process proc_table[NUM_TASKS];          //进程表
 
-uint8_t Task_Stack[TASKA_STACK_SIZE*10];   //进程栈
+uint8_t Task_Stack[TASK_STACK_SIZE*10];   //进程栈
+
+//**** 内存
+uint8_t phyMem[0x100000]; // 1MB
 
 //**** 系统调用
 #define NUM_SYSCALLS 10
@@ -41,33 +48,21 @@ _ptr_syscall SysCall_Table[NUM_SYSCALLS];
 // #define NUM_INTS 16
 // int_handler Int_Table[NUM_INTS];
 
+/**** Memmory Manager
+     0x100000～0x1100000 16MB的可分配的内存空间
+****/
+
+MemBlock * MemHead;
+
+#define MEM_ADDR 0x100000
+
 extern void mulpro();
 extern int k_reenter;
 
 void kernel(){
 
-    //__asm__("int $0x21\r\n");
+    proc_current = proc_table;
 
-    //printf("hello world!\r\n");
-    //char s[] = "hello";
-    // printf("@Ares >%d%d",123,321);
-    // //printf("%s",s);
-    // get_char();
-    //__asm__("int $0x21\r\n");
-
-    //enble_irq(KEYBOARD_IRQ);
-
-    //get_char();
-    proc_current = proc_table+1;
-    // __asm__(
-    //     "movl $1, %eax\r\n"
-    //     "int $0x80");
-    num_proc_alive = 2;
-    //mulpro();
-    //printf("%d",proc_current->pid);
-    //schedule();
-    //get_char();
-    //load_program(4);
     restart();
     while(1) ;
 }

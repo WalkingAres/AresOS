@@ -4,6 +4,7 @@
 #include "proc.h"
 #include "pm.h"
 #include "syscall.h"
+#include "malloc.h"
 //内核使用的全局数据
 
 extern uint32_t    gdt_pos;//指向表中最后一个描述符
@@ -19,16 +20,26 @@ extern int num_proc_alive;
 extern int k_reenter;
 
 extern Process *proc_current;  
+extern ProcNode *procCurrent;
+extern ProcNode *procReady;
+extern ProcNode *procDied;
+extern ProcNode *procSleep;
 
-#define TASKA_STACK_SIZE 0x1000
-#define TASKB_STACK_SIZE 0x1000
+#define TASK_STACK_SIZE 0x1000
 #define USER_STACK_SIZE  0x1000
-#define STACK_SIZE_TATAL  (TASKA_STACK_SIZE + TASKB_STACK_SIZE + USER_STACK_SIZE)
 
 extern Process proc_table[NUM_TASKS];
 
-extern uint8_t Task_Stack[TASKA_STACK_SIZE*10];
+extern uint8_t Task_Stack[TASK_STACK_SIZE*10];
+
+
+extern const uint8_t *phyMem;
 
 #define NUM_SYSCALLS 10
+
 extern _ptr_syscall SysCall_Table[NUM_SYSCALLS];
+
+extern MemBlock * MemHead;
+#define MEM_ADDR 0x100000
+
 #endif

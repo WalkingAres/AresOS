@@ -5,7 +5,7 @@ int printf(const char * format, ...) {
     va_list ap;
     va_start(ap,format);
     const char * p = format;
-    int count , num, top;
+    int count , num, top, left;
     char * str;
     count = 0;
     char s[20];
@@ -30,6 +30,47 @@ int printf(const char * format, ...) {
                             top--;
                         }
                         break;
+
+                    case 'x':
+                        num = va_arg(ap, int);
+                        top = 0;
+                        do {
+                            left = num%16;
+
+                            if(left < 10) s[top] = left + '0';
+                            else s[top] = left + 87;
+                            
+                            num /= 16;
+                            top++;
+                        }while(num > 0);
+                        top--;
+                        while(top >= 0) {
+                            count++;
+                            put_char(s[top]);
+                            top--;
+                        }
+                        break;
+
+                    case 'X':
+                        num = va_arg(ap, int);
+                        top = 0;
+                        do {
+                            left = num%16;
+
+                            if(left < 10) s[top] = left + '0';
+                            else s[top] = left + 55;
+                            
+                            num /= 16;
+                            top++;
+                        }while(num > 0);
+                        top--;
+                        while(top >= 0) {
+                            count++;
+                            put_char(s[top]);
+                            top--;
+                        }
+                        break;
+                    
 
                     case 's':
                         str = va_arg(ap,char *);

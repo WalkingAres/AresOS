@@ -33,10 +33,10 @@ typedef struct proc_stackframe {
 }StackFrame;
 
 typedef enum _proc_state{
-    alive,
-    suspended,
-    sleep,
-    died
+    ALIVE,
+    READY,
+    SLEEP,
+    DIED
 }_proc_state;
 
 typedef struct _process
@@ -73,5 +73,20 @@ void exec();
 void init_exec(_funcptr func);
 
 void init_mulpro();
+
+
+//***** 线程队列数据结构
+
+//双向循环队列
+typedef struct ProcNode
+{
+    Process *pproc;
+    struct ProcNode *pre;
+    struct ProcNode *next;
+}ProcNode;
+
+ProcNode* pre(const ProcNode * cur);
+ProcNode* next(const ProcNode * cur);
+
 
 #endif
