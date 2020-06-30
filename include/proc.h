@@ -51,6 +51,12 @@ typedef struct _process
     _proc_state state;
     uint32_t pid;
 
+    uint32_t stack;
+
+    struct _process * parent;
+    struct _process * head_child;
+    struct _process * next;
+
     char p_name[16];
 }Process;
 
@@ -87,6 +93,15 @@ typedef struct ProcNode
 
 ProcNode* pre(const ProcNode * cur);
 ProcNode* next(const ProcNode * cur);
+
+int do_fork(uint32_t flag, uint32_t stack, StackFrame * regs);
+int do_exit(uint32_t state);
+int do_wait(void);
+int do_execv(uint32_t ptr_func);
+
+void ProcCpy(Process * child, Process *parent);
+
+uint32_t set_pid();
 
 
 #endif

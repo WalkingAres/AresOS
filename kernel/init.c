@@ -82,65 +82,6 @@ void init_mm() {
     MemHead->size = 0x1000000;
 }
 
-void delay()
-{
-    int i, j;
-    for (int i = 0; i < 10000; i++)
-        j++;
-}
-
-void taskA()
-{
-    while (1)
-    {
-        __asm__("cli\r\n");
-        get_time();
-        showtime();
-        //delay();
-        __asm__("sti\r\n");
-    }
-}
-
-void taskB()
-{
-    //printf("taskB is running!\r\n");
-    char t[10];
-    while (1)
-    {
-        printf(itoa(proc_table[1].ticks,t));
-        printf("B");
-        //__asm__(
-        // "movl $1, %eax\r\n"
-        // "int $0x80");
-        //put_char('0'+i);
-        // i++;
-        delay();
-    }
-    //printf("taskA!");
-}
-
-void sys_1(){
-        printf("syscall_1");
-        //put_char('0'+i);
-        // i++;
-        proc_table[0].state = READY;
-        // int i;
-        // for(i=3;i<=6;i++) proc_table[i].state = DIED;
-        proc_current->state = DIED;
-        schedule();
-        // delay();
-}
-void sys_0(){
-        printf("syscall_0");
-        //put_char('0'+i);
-        // i++;
-        delay();
-}
-
-void sys_2(char *s) {
-    printf("%s!\r\n",s);
-}
-
 extern void _shell(void);
 
 int k_reenter;
@@ -191,25 +132,37 @@ void init()
         proc->state = DIED;
         proc->priorty = 10;
         task_stack = task_stack - TASK_STACK_SIZE;
+
+        proc->stack = (uint32_t) (task_stack-TASK_STACK_SIZE);
+
+        proc->parent = NULL;
+        proc->head_child = NULL;
         proc++;
         task++;
         ldt_sel = ldt_sel + 8;
     }
 
     proc_table[0].priorty = 50;
-    proc_table[1].priorty = 1;
 
-    proc_table[0].state = READY;
+    proc_table[0].state = ALIVE;
 
-    SysCall_Table[0] = sys_0;
-    SysCall_Table[1] = sys_1;
-    SysCall_Table[2] = sys_2;
+    SysCall_Table[1] = sys_fork;
+    SysCall_Table[2] = sys_exit;
+    SysCall_Table[3] = sys_wait;
+    SysCall_Table[4] = sys_execv;
+
     set_intGate(0x80,syscall);
     idt[0x80].attr = 0xae;
+    
     k_reenter = 0;
 
-    procCurrent->pproc = proc_table;
-    procCurrent->next = procCurrent;
+    ProcNode * shell = malloc(sizeof(ProcNode));
+    shell->pproc = proc_table;
+    shell->next = shell;
+    shell->pre = shell;
+    procReady = shell;
+    procCurrent = shell;
+
 
     procDied = NULL;
     procSleep = NULL;

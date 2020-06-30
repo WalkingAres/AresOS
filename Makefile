@@ -2,7 +2,7 @@ CC = x86_64-elf-gcc
 LD = x86_64-elf-ld
 
 INCLUDE = -I include/ -I mm/
-KernLib = -I kernel/ -I kernel/lib/ -I kernel/interrupt -I kernel/drive 
+KernLib = -I kernel/ -I kernel/lib/ -I kernel/interrupt -I kernel/drive -I lib/
 
 CFLAGS 	= -m32 -march=i386 -mpreferred-stack-boundary=2 -ffreestanding -fno-builtin -c
 #CFLAGS 	= -m32 -fno-builtin -c

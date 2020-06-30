@@ -3,6 +3,7 @@
 #include "string.h"
 #include "time.h"
 #include "kernlib.h"
+#include "unistd.h"
 
 typedef enum shell_cmd {
     HELP,
@@ -81,8 +82,26 @@ void _shell() {
     char cmd[100];
     cmd_key key;
     clear_screen();
-    //get_char();
     char s[]="hello Ares OS!\r\n"; 
+    printf("%s",s);
+    //get_char();
+
+    // int pid = fork();
+    // if(pid == 0) {
+    //     load_program(1);
+    //     pro();
+    //     //execv(0x60400);
+    // }
+
+    // printf("parent");
+    // wait();
+    // printf("back to shell");
+
+    // while (1)
+    // {
+    // }
+    
+
     while(1) {
         printf("@Ares >");
         scanf("%s",cmd);

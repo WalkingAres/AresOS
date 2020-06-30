@@ -1,6 +1,9 @@
 {
     "C_Cpp.errorSquiggles": "Enabled",
     "files.associations": {
-        "cstdio": "cpp"
+        "cstdio": "cpp",
+        "cstdlib": "c",
+        "locale": "c",
+        "string": "c"
     }
 }

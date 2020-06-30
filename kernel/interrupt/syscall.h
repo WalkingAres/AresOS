@@ -6,33 +6,19 @@
 #define EXIT 1
 #define FORK 2
 #define WAIT 3
+#define EXEC 4
 
-typedef void *_ptr_syscall;
-
-typedef void (*_ptr_syscall0)(void);
-
-typedef void (*_ptr_syscall1)(void *);
-
+typedef int (*_ptr_syscall)(uint32_t arg[]);
 
 __attribute__((naked))
-void syscall();
+void syscall(void);
 
+int sys_fork(uint32_t arg[]);
 
-void sys_1(){
-        printf("syscall_1");
-        proc_current->state = DIED;
-        schedule();
-}
+int sys_exit(uint32_t arg[]);
 
-void sys_0(){
-        printf("syscall_0");
-        //put_char('0'+i);
-        // i++;
-        delay();
-}
+int sys_wait(uint32_t arg[]);
 
-void sys_2(char *s) {
-    printf("%s!\r\n",s);
-}
+int sys_execv(uint32_t arg[]);
 
 #endif

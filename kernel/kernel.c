@@ -58,6 +58,7 @@ MemBlock * MemHead;
 
 extern void mulpro();
 extern int k_reenter;
+extern void _shell();
 
 void kernel(){
 
