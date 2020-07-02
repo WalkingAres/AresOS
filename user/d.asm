@@ -5,7 +5,7 @@ org 0x61000
      Up_Rt equ 2                  ;
      Up_Lt equ 3                  ;
      Dn_Lt equ 4                  ;
-     delay equ 1500				; 计时器延迟计数,用于控制画框的速度
+     delay equ 150			; 计时器延迟计数,用于控制画框的速度
      ddelay equ 1000				; 计时器延迟计数,用于控制画框的速度
 
 start:
@@ -210,7 +210,7 @@ showMsg:
 	cmp ecx,0
 	jnz pro
 	
-	mov eax, 1
+	mov eax, 2
 	int 0x80
 	ret 
 

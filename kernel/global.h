@@ -32,6 +32,8 @@ extern Process proc_table[NUM_TASKS];
 
 extern uint8_t Task_Stack[TASK_STACK_SIZE*10];
 
+extern uint32_t pid_map;
+
 
 extern const uint8_t *phyMem;
 

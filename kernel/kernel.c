@@ -37,8 +37,7 @@ Process proc_table[NUM_TASKS];          //进程表
 
 uint8_t Task_Stack[TASK_STACK_SIZE*10];   //进程栈
 
-//**** 内存
-uint8_t phyMem[0x100000]; // 1MB
+uint32_t pid_map;
 
 //**** 系统调用
 #define NUM_SYSCALLS 10

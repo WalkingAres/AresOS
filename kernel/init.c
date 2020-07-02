@@ -118,6 +118,8 @@ void init()
         memcpy(&(proc->ldts[1]), &(gdt[SelectorData >> 3]), sizeof(DESCRIPTOR));
         proc->ldts[1].attr1 = SEG_DRW | PL_TASK << 5;
 
+        memcpy(proc->p_name,task->name,16);
+
         proc->regs.cs = (0 & 0xfff8) | LDT_TI | PL_TASK;
         proc->regs.ds = (8 & 0xfff8) | LDT_TI | PL_TASK;
         proc->regs.es = (8 & 0xfff8) | LDT_TI | PL_TASK;
@@ -137,6 +139,8 @@ void init()
 
         proc->parent = NULL;
         proc->head_child = NULL;
+        proc->next = NULL;
+
         proc++;
         task++;
         ldt_sel = ldt_sel + 8;
@@ -153,7 +157,7 @@ void init()
 
     set_intGate(0x80,syscall);
     idt[0x80].attr = 0xae;
-    
+
     k_reenter = 0;
 
     ProcNode * shell = malloc(sizeof(ProcNode));
@@ -162,6 +166,8 @@ void init()
     shell->pre = shell;
     procReady = shell;
     procCurrent = shell;
+
+    pid_map = 1;
 
 
     procDied = NULL;

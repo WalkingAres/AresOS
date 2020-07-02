@@ -13,7 +13,7 @@ KernInc = -I $(INCLUDE) kernel/
 kernobj = run/kernel1.o run/kernel2.o run/init.o  run/string.o run/kernlib1.o run/kernlib2.o \
 		run/int.o run/pm.o run/video.o \
 		run/clock.o run/keyboard.o run/global.o run/time.o run/hd.o run/syscall.o \
-		run/shell.o run/proc.o run/stdio.o run/malloc.o
+		run/shell.o run/proc.o run/stdio.o run/malloc.o run/test.o
 kerntarget = run/kernel.bin
 OUT = -o $@ $<
 
@@ -61,6 +61,8 @@ run/proc.o : include/proc.c
 run/stdio.o : include/stdio.c
 	$(CC) $(CFLAGS) $(INCLUDE) $(KernLib) $(OUT)
 run/malloc.o : mm/malloc.c
+	$(CC) $(CFLAGS) $(INCLUDE) $(KernLib) $(OUT)
+run/test.o : user/test.c 
 	$(CC) $(CFLAGS) $(INCLUDE) $(KernLib) $(OUT)
 
 

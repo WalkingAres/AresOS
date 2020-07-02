@@ -103,5 +103,6 @@ void ProcCpy(Process * child, Process *parent);
 
 uint32_t set_pid();
 
+void set_name(const char *name);
 
 #endif

@@ -86,7 +86,7 @@ void init_clock() {
     //Ê±ÖÓÆµÂÊ 100hz
     out_byte(0x43,0x34);
     out_byte(0x40,(uint8_t)1193182/1000);
-    out_byte(0x40,(uint8_t)(1193182/1000>> 8));
+    out_byte(0x40,(uint8_t)(1193182/1000 >> 8));
     
     set_intGate(CLOCK_VECTOR,clock);
     enble_irq(CLOCK_IRQ);

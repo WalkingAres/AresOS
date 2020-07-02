@@ -7,7 +7,7 @@ org 0x60400
      Up_Lt equ 3                  ;
      Dn_Lt equ 4                  ;
      delay equ 1200				; 计时器延迟计数,用于控制画框的速度
-     ddelay equ 1000				; 计时器延迟计数,用于控制画框的速度
+     ddelay equ 200				; 计时器延迟计数,用于控制画框的速度
 
 start:
 	;xor ax,ax					; AX = 0   程序加载到0000：100h才能正确执行

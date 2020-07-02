@@ -48,9 +48,19 @@ void ProcCpy(Process * child, Process *parent){
 }
 
 uint32_t set_pid() {
-    return 3;
+   int i;
+   for(i=0;i<32;i++) {
+       if( (pid_map & (0x01<<i)) == 0 ) {
+           pid_map = pid_map | (1 << i);
+           return i;
+       }
+   }
+   return -1;
 }
 
+void set_name(const char * name) {
+    memcpy(proc_current->p_name,name,16);
+}
 
 int do_fork(uint32_t flag, uint32_t stack, StackFrame * regs){
     if(flag == 0) {
@@ -72,10 +82,19 @@ int do_fork(uint32_t flag, uint32_t stack, StackFrame * regs){
         new->regs.eax = 0;
         new->state = READY;
 
+        // 指定父进程，加入父进程的子进程队列    
         new->parent = proc_current;
-        Process * temp = proc_current->head_child->next;
-        proc_current->head_child = new;
-        new->next = temp;
+
+        if(proc_current->head_child == NULL) {
+            proc_current->head_child = new;
+            new->next = 0;
+        }
+        else{
+            Process * temp = proc_current->head_child;
+            proc_current->head_child = new;
+            new->next = temp;
+        }
+    
 
         new->pid = set_pid();
 
@@ -91,16 +110,23 @@ int do_fork(uint32_t flag, uint32_t stack, StackFrame * regs){
 
         procReady = newnode;
 
+        return new->pid;
+
     }
 
-    return 1;
+    return -1;
 }
 
 int do_exit(uint32_t state) {
     Process * current = proc_current;
     ProcNode * temp;
     if(current->parent != NULL ) {
-        // remove from reat quque
+        // unable pid 
+        current->pid;
+
+        pid_map &= ~(1 << current->pid);
+
+        // remove from ready quque
         temp = procCurrent->pre;
         temp->next = procCurrent->next;
         procCurrent->next->pre= temp;
@@ -126,21 +152,27 @@ int do_exit(uint32_t state) {
 }
 
 int do_wait() {
-    printf("wait");
-    while (1)
-    {
-        /* code */
-    }
     
     Process *parent = proc_current;
     Process *head = proc_current->head_child;
+    Process *pre = NULL;
     if(head == NULL ) return 0;
+
     while(1) {
         if(head->state == DIED ) {
+            // 从子进程列表中删除
+            if(head == proc_current->head_child ) {
+                proc_current->head_child = head->next;
+            }
+            else{
+                pre->next = head->next;
+            }
+            
             free((uint32_t*)(head->stack));
             free(head);
             return head->pid;
         }
+        pre = head;
         head = head->next;
         if(head == NULL ) {
             head = proc_current->head_child;
@@ -150,7 +182,9 @@ int do_wait() {
 }
 
 int do_execv(uint32_t ptr_func) {
-    if(ptr_func != 0) proc_current->regs.eip = ptr_func;
+    if(ptr_func != 0) {
+        proc_current->regs.eip = ptr_func;
+    }
     return 0;
 }
 

@@ -6,7 +6,7 @@ org 0x60800
      Up_Rt equ 2                  ;
      Up_Lt equ 3                  ;
      Dn_Lt equ 4                  ;
-     delay equ 1500				; 计时器延迟计数,用于控制画框的速度
+     delay equ 150			; 计时器延迟计数,用于控制画框的速度
      ddelay equ 1000				; 计时器延迟计数,用于控制画框的速度
 
      ;org 0x600					; 程序加载到 cs : 8200h
@@ -213,7 +213,7 @@ showMsg:
 	jnz pro
 	
 
-	mov eax, 1
+	mov eax, 2
 	int 0x80
 
 	ret 
